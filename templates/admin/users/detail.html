@@ -1,0 +1,76 @@
+{% extends 'admin/base.html' %}
+{% block title %}{{ user.nickname }} - ユーザー管理{% endblock %}
+
+{% block content %}
+<div class="flex items-center gap-3 mb-4">
+    <a href="{{ url_for('admin.users_list') }}" class="text-gray-400 hover:text-primary">
+        <i data-lucide="arrow-left" class="w-5 h-5"></i>
+    </a>
+    <h1 class="text-xl font-bold text-gray-800">{{ user.nickname }}</h1>
+    <span class="px-2 py-0.5 rounded-full text-xs font-bold text-white" style="background-color: {{ user.rank.color }};">{{ user.rank.name }}</span>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+    <!-- ポイント調整 -->
+    <div class="bg-white rounded-xl border border-gray-200 p-4">
+        <h2 class="font-bold text-gray-800 mb-3 text-sm flex items-center gap-1">
+            <i data-lucide="coins" class="w-4 h-4 text-primary"></i>ポイント調整
+        </h2>
+        <div class="text-sm text-gray-600 mb-3">
+            現在: <span class="font-bold text-primary">{{ '{:,}'.format(user.total_points) }}P</span>
+            (累計: {{ '{:,}'.format(user.lifetime_points) }}P)
+        </div>
+        <form method="POST" class="flex gap-2">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="action" value="adjust_points">
+            <input type="number" name="amount" placeholder="例: 100 or -50" required
+                   class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30">
+            <button type="submit" class="bg-primary text-white px-4 py-2 rounded-lg text-sm font-bold hover:opacity-90">調整</button>
+        </form>
+    </div>
+
+    <!-- ランク変更 -->
+    <div class="bg-white rounded-xl border border-gray-200 p-4">
+        <h2 class="font-bold text-gray-800 mb-3 text-sm flex items-center gap-1">
+            <i data-lucide="award" class="w-4 h-4 text-primary"></i>ランク変更
+        </h2>
+        <form method="POST" class="flex gap-2">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="action" value="change_rank">
+            <select name="rank_code" class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30">
+                {% for rank in ranks %}
+                <option value="{{ rank.code }}" {{ 'selected' if rank.code == user.rank_code }}>{{ rank.name }} ({{ rank.code }})</option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="bg-primary text-white px-4 py-2 rounded-lg text-sm font-bold hover:opacity-90">変更</button>
+        </form>
+    </div>
+</div>
+
+<!-- ポイント履歴 -->
+<h2 class="font-bold text-gray-800 mb-3 text-sm">ポイント履歴 (直近30件)</h2>
+<div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+    <table class="w-full text-sm">
+        <thead class="bg-gray-50 text-gray-600">
+            <tr>
+                <th class="px-4 py-2 text-left">日時</th>
+                <th class="px-4 py-2 text-left">内容</th>
+                <th class="px-4 py-2 text-left hidden md:table-cell">ソース</th>
+                <th class="px-4 py-2 text-right">ポイント</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+            {% for h in histories %}
+            <tr>
+                <td class="px-4 py-2 text-xs text-gray-400">{{ h.created_at.strftime('%m/%d %H:%M') }}</td>
+                <td class="px-4 py-2 text-gray-700">{{ h.description or '-' }}</td>
+                <td class="px-4 py-2 text-xs text-gray-400 hidden md:table-cell">{{ h.source }}</td>
+                <td class="px-4 py-2 text-right font-bold {{ 'text-primary' if h.amount > 0 else 'text-gray-500' }}">
+                    {{ '{:+,}'.format(h.amount) }}P
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

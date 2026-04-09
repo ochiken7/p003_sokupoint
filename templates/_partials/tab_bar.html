@@ -1,0 +1,31 @@
+{% if current_user %}
+<nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-border_pink z-50">
+    <div class="flex justify-around items-center h-16">
+        <a href="{{ url_for('home.index') }}" class="flex flex-col items-center gap-0.5 text-xs
+            {% if request.endpoint == 'home.index' %}text-primary{% else %}text-gray-400{% endif %}
+            hover:text-primary transition-colors">
+            <i data-lucide="home" class="w-5 h-5"></i><span>ホーム</span>
+        </a>
+        <a href="{{ url_for('game.index') }}" class="flex flex-col items-center gap-0.5 text-xs
+            {% if request.endpoint and request.endpoint.startswith('game.') %}text-primary{% else %}text-gray-400{% endif %}
+            hover:text-primary transition-colors">
+            <i data-lucide="gamepad-2" class="w-5 h-5"></i><span>ゲーム</span>
+        </a>
+        <a href="{{ url_for('coupon.index') }}" class="flex flex-col items-center gap-0.5 text-xs
+            {% if request.endpoint and request.endpoint.startswith('coupon.') %}text-primary{% else %}text-gray-400{% endif %}
+            hover:text-primary transition-colors">
+            <i data-lucide="ticket" class="w-5 h-5"></i><span>クーポン</span>
+        </a>
+        <a href="{{ url_for('checkin.index') }}" class="flex flex-col items-center gap-0.5 text-xs
+            {% if request.endpoint and request.endpoint.startswith('checkin.') %}text-primary{% else %}text-gray-400{% endif %}
+            hover:text-primary transition-colors">
+            <i data-lucide="map-pin" class="w-5 h-5"></i><span>チェックイン</span>
+        </a>
+        <a href="{{ url_for('me.index') }}" class="flex flex-col items-center gap-0.5 text-xs
+            {% if request.endpoint == 'me.index' %}text-primary{% else %}text-gray-400{% endif %}
+            hover:text-primary transition-colors">
+            <i data-lucide="user" class="w-5 h-5"></i><span>マイページ</span>
+        </a>
+    </div>
+</nav>
+{% endif %}

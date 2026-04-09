@@ -1,0 +1,102 @@
+<!-- ルーレットゲーム -->
+<div class="card text-center" id="roulette-game">
+    <div class="relative mx-auto mb-4" style="width: 280px; height: 280px;">
+        <!-- 矢印 -->
+        <div class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1 z-10">
+            <i data-lucide="triangle" class="w-8 h-8 text-primary fill-primary"></i>
+        </div>
+        <canvas id="roulette-canvas" width="280" height="280"></canvas>
+    </div>
+
+    <button id="spin-btn" class="btn-primary text-lg px-8 py-3" onclick="spinRoulette()">
+        ルーレットを回す!
+    </button>
+
+    <form method="POST" action="{{ url_for('game.result', game_id=game.id) }}" id="roulette-form" class="hidden">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="btn-primary text-lg px-8 py-3 mt-4">結果を確認する</button>
+    </form>
+</div>
+
+{% block scripts %}
+<script>
+(function() {
+    const canvas = document.getElementById('roulette-canvas');
+    const ctx = canvas.getContext('2d');
+    const segments = {{ config.get('segments', []) | tojson }};
+    const segCount = segments.length || 8;
+    const segAngle = (2 * Math.PI) / segCount;
+    let rotation = 0;
+
+    function drawWheel(rot) {
+        ctx.clearRect(0, 0, 280, 280);
+        ctx.save();
+        ctx.translate(140, 140);
+        ctx.rotate(rot);
+
+        for (let i = 0; i < segCount; i++) {
+            const start = i * segAngle;
+            const end = start + segAngle;
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.arc(0, 0, 130, start, end);
+            ctx.closePath();
+            ctx.fillStyle = segments[i] ? segments[i].color : (i % 2 ? '#6B7280' : '#E63946');
+            ctx.fill();
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // ラベル
+            ctx.save();
+            ctx.rotate(start + segAngle / 2);
+            ctx.textAlign = 'center';
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 12px "Noto Sans JP"';
+            ctx.fillText(segments[i] ? segments[i].label : '', 80, 5);
+            ctx.restore();
+        }
+
+        ctx.restore();
+
+        // 中心円
+        ctx.beginPath();
+        ctx.arc(140, 140, 20, 0, Math.PI * 2);
+        ctx.fillStyle = '#fff';
+        ctx.fill();
+        ctx.strokeStyle = '#E63946';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+    }
+
+    drawWheel(0);
+
+    window.spinRoulette = function() {
+        document.getElementById('spin-btn').disabled = true;
+        document.getElementById('spin-btn').textContent = '回転中...';
+
+        const totalRotation = rotation + Math.PI * 2 * (5 + Math.random() * 5);
+        const duration = 3000;
+        const start = performance.now();
+
+        function animate(now) {
+            const elapsed = now - start;
+            const progress = Math.min(elapsed / duration, 1);
+            const eased = 1 - Math.pow(1 - progress, 3);
+            const current = rotation + (totalRotation - rotation) * eased;
+
+            drawWheel(current);
+
+            if (progress < 1) {
+                requestAnimationFrame(animate);
+            } else {
+                rotation = totalRotation % (Math.PI * 2);
+                document.getElementById('roulette-form').classList.remove('hidden');
+                document.getElementById('spin-btn').classList.add('hidden');
+            }
+        }
+        requestAnimationFrame(animate);
+    };
+})();
+</script>
+{% endblock %}

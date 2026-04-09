@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% block title %}ランク - 即ポイントクラブ{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <h1 class="text-xl font-bold text-gray-800 flex items-center gap-2">
+        <i data-lucide="award" class="w-6 h-6 text-primary"></i>
+        会員ランク
+    </h1>
+</div>
+
+<!-- 現在のランク -->
+<div class="card mb-4 text-center">
+    <div class="w-20 h-20 rounded-full mx-auto mb-3 flex items-center justify-center"
+         style="background-color: {{ user.rank.color }}20;">
+        <i data-lucide="crown" class="w-10 h-10" style="color: {{ user.rank.color }};"></i>
+    </div>
+    <span class="rank-badge text-sm px-3 py-1" style="background-color: {{ user.rank.color }};">
+        {{ user.rank.name }}
+    </span>
+    <p class="text-sm text-gray-500 mt-2">倍率: x{{ user.rank.bonus_multiplier }}</p>
+
+    {% if next_rank %}
+    <!-- プログレスバー -->
+    <div class="mt-4">
+        <div class="flex justify-between text-xs text-gray-500 mb-1">
+            <span>{{ user.rank.name }}</span>
+            <span>{{ next_rank.name }}</span>
+        </div>
+        <div class="w-full bg-gray-100 rounded-full h-3">
+            <div class="h-3 rounded-full transition-all" style="width: {{ progress }}%; background-color: {{ user.rank.color }};"></div>
+        </div>
+        <p class="text-xs text-gray-500 mt-1">
+            あと <span class="font-bold text-primary">{{ '{:,}'.format(points_to_next) }}P</span> で {{ next_rank.name }} に昇格
+        </p>
+    </div>
+    {% else %}
+    <p class="text-sm text-primary font-bold mt-3">最高ランク達成!</p>
+    {% endif %}
+</div>
+
+<!-- ランク一覧 -->
+<h2 class="font-bold text-gray-800 mb-3 text-sm">ランク一覧</h2>
+<div class="space-y-2">
+    {% for rank in ranks %}
+    <div class="card flex items-center gap-3 {% if rank.code == user.rank_code %}border-2{% endif %}"
+         {% if rank.code == user.rank_code %}style="border-color: {{ rank.color }};"{% endif %}>
+        <div class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
+             style="background-color: {{ rank.color }}20;">
+            <i data-lucide="award" class="w-5 h-5" style="color: {{ rank.color }};"></i>
+        </div>
+        <div class="flex-1">
+            <div class="flex items-center gap-2">
+                <span class="font-bold text-sm" style="color: {{ rank.color }};">{{ rank.name }}</span>
+                {% if rank.code == user.rank_code %}
+                <span class="text-xs bg-primary text-white px-1.5 py-0.5 rounded">現在</span>
+                {% endif %}
+            </div>
+            <div class="text-xs text-gray-500">
+                累計 {{ '{:,}'.format(rank.min_lifetime_points) }}P 以上 / 倍率 x{{ rank.bonus_multiplier }}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

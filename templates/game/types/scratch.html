@@ -1,0 +1,79 @@
+<!-- スクラッチゲーム -->
+<div class="card text-center" id="scratch-game">
+    <p class="text-sm text-gray-500 mb-4">カードをクリックして削ろう!</p>
+
+    <div id="scratch-area" class="relative mx-auto mb-4 cursor-pointer select-none"
+         style="width: 280px; height: 180px;">
+        <!-- 結果（裏面） -->
+        <canvas id="scratch-canvas" width="280" height="180"
+                class="absolute inset-0 rounded-xl"></canvas>
+        <div id="scratch-result" class="w-full h-full rounded-xl flex items-center justify-center"
+             style="background: linear-gradient(135deg, #FFF5F5, #FFB4BA);">
+            <span class="text-2xl font-bold text-primary" id="result-text">???</span>
+        </div>
+    </div>
+
+    <form method="POST" action="{{ url_for('game.result', game_id=game.id) }}" id="scratch-form" class="hidden">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="btn-primary">結果を確認する</button>
+    </form>
+</div>
+
+{% block scripts %}
+<script>
+(function() {
+    const canvas = document.getElementById('scratch-canvas');
+    const ctx = canvas.getContext('2d');
+    const form = document.getElementById('scratch-form');
+    let scratched = 0;
+    let isDrawing = false;
+    let revealed = false;
+
+    // グレーのカバーを描画
+    ctx.fillStyle = '#9CA3AF';
+    ctx.fillRect(0, 0, 280, 180);
+    ctx.fillStyle = '#6B7280';
+    ctx.font = 'bold 18px "Noto Sans JP"';
+    ctx.textAlign = 'center';
+    ctx.fillText('ここを削ってね!', 140, 95);
+
+    function scratch(x, y) {
+        ctx.globalCompositeOperation = 'destination-out';
+        ctx.beginPath();
+        ctx.arc(x, y, 20, 0, Math.PI * 2);
+        ctx.fill();
+        scratched++;
+
+        if (scratched > 30 && !revealed) {
+            revealed = true;
+            canvas.style.opacity = '0';
+            canvas.style.transition = 'opacity 0.5s';
+            form.classList.remove('hidden');
+        }
+    }
+
+    canvas.addEventListener('mousedown', () => isDrawing = true);
+    canvas.addEventListener('mouseup', () => isDrawing = false);
+    canvas.addEventListener('mouseleave', () => isDrawing = false);
+    canvas.addEventListener('mousemove', (e) => {
+        if (!isDrawing) return;
+        const rect = canvas.getBoundingClientRect();
+        scratch(e.clientX - rect.left, e.clientY - rect.top);
+    });
+
+    canvas.addEventListener('touchmove', (e) => {
+        e.preventDefault();
+        const rect = canvas.getBoundingClientRect();
+        const touch = e.touches[0];
+        scratch(touch.clientX - rect.left, touch.clientY - rect.top);
+    }, { passive: false });
+
+    canvas.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        const rect = canvas.getBoundingClientRect();
+        const touch = e.touches[0];
+        scratch(touch.clientX - rect.left, touch.clientY - rect.top);
+    }, { passive: false });
+})();
+</script>
+{% endblock %}

@@ -1,0 +1,67 @@
+{% extends 'admin/base.html' %}
+{% block title %}{{ 'トロフィー編集' if trophy else 'トロフィー新規作成' }}{% endblock %}
+
+{% block content %}
+<h1 class="text-xl font-bold text-gray-800 mb-4">{{ 'トロフィー編集' if trophy else 'トロフィー新規作成' }}</h1>
+
+<form method="POST" class="bg-white rounded-xl border border-gray-200 p-6 space-y-4 max-w-2xl">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+    <div class="grid grid-cols-2 gap-4">
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">コード (一意)</label>
+            <input type="text" name="code" value="{{ trophy.code if trophy else '' }}" required
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30">
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">表示名</label>
+            <input type="text" name="name" value="{{ trophy.name if trophy else '' }}" required
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30">
+        </div>
+    </div>
+
+    <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">説明</label>
+        <textarea name="description" rows="2" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30">{{ trophy.description if trophy else '' }}</textarea>
+    </div>
+
+    <div class="grid grid-cols-3 gap-4">
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">アイコン名</label>
+            <input type="text" name="icon_name" value="{{ trophy.icon_name if trophy else 'trophy' }}" placeholder="trophy"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30">
+            <p class="text-xs text-gray-400 mt-1">Lucideアイコン名</p>
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">条件タイプ</label>
+            <select name="condition_type" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30">
+                {% for val, label in [('login_streak','連続ログイン'), ('game_play_count','ゲームプレイ数'), ('checkin_count','チェックイン数'), ('login_bonus_count','ボーナス受取数'), ('lifetime_points','累計ポイント')] %}
+                <option value="{{ val }}" {{ 'selected' if trophy and trophy.condition_type == val }}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">条件値</label>
+            <input type="number" name="condition_value" min="1" value="{{ trophy.condition_value if trophy else 1 }}"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30">
+        </div>
+    </div>
+
+    <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">報酬ポイント</label>
+        <input type="number" name="points_reward" min="0" value="{{ trophy.points_reward if trophy else 0 }}"
+               class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 max-w-xs">
+    </div>
+
+    <div class="flex items-center gap-2">
+        <input type="checkbox" name="is_active" id="is_active" {{ 'checked' if not trophy or trophy.is_active }}
+               class="w-4 h-4 text-primary rounded">
+        <label for="is_active" class="text-sm text-gray-700">有効にする</label>
+    </div>
+
+    <div class="flex gap-3 pt-2">
+        <button type="submit" class="bg-primary text-white px-6 py-2 rounded-lg text-sm font-bold hover:opacity-90">保存</button>
+        <a href="{{ url_for('admin.trophies_list') }}" class="px-6 py-2 rounded-lg text-sm text-gray-600 border border-gray-300 hover:bg-gray-50">キャンセル</a>
+    </div>
+</form>
+{% endblock %}

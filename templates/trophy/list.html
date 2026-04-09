@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block title %}トロフィー - 即ポイントクラブ{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <h1 class="text-xl font-bold text-gray-800 flex items-center gap-2">
+        <i data-lucide="trophy" class="w-6 h-6 text-primary"></i>
+        トロフィー
+    </h1>
+    <p class="text-sm text-gray-500 mt-1">
+        獲得: {{ unlocked_ids | length }} / {{ trophies | length }}
+    </p>
+</div>
+
+<div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+    {% for trophy in trophies %}
+    <div class="card text-center {{ 'opacity-40' if trophy.id not in unlocked_ids }}">
+        <div class="w-14 h-14 rounded-full mx-auto mb-2 flex items-center justify-center
+            {% if trophy.id in unlocked_ids %}bg-primary/10{% else %}bg-gray-100{% endif %}">
+            <i data-lucide="{{ trophy.icon_name }}" class="w-7 h-7
+                {% if trophy.id in unlocked_ids %}text-primary{% else %}text-gray-300{% endif %}"></i>
+        </div>
+        <h3 class="text-sm font-bold text-gray-800 truncate">{{ trophy.name }}</h3>
+        <p class="text-xs text-gray-500 mt-0.5 line-clamp-2">{{ trophy.description }}</p>
+        {% if trophy.points_reward > 0 %}
+        <p class="text-xs mt-1 {% if trophy.id in unlocked_ids %}text-primary font-bold{% else %}text-gray-400{% endif %}">
+            +{{ trophy.points_reward }}P
+        </p>
+        {% endif %}
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

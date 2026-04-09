@@ -1,0 +1,63 @@
+{% extends 'admin/base.html' %}
+{% block title %}ゲーム管理{% endblock %}
+
+{% block content %}
+<div class="flex items-center justify-between mb-4">
+    <h1 class="text-xl font-bold text-gray-800">ゲーム管理</h1>
+    <a href="{{ url_for('admin.games_create') }}" class="bg-primary text-white px-4 py-2 rounded-lg text-sm font-bold hover:opacity-90 flex items-center gap-1">
+        <i data-lucide="plus" class="w-4 h-4"></i>新規作成
+    </a>
+</div>
+
+<div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+    <table class="w-full text-sm">
+        <thead class="bg-gray-50 text-gray-600">
+            <tr>
+                <th class="px-4 py-3 text-left">ゲーム名</th>
+                <th class="px-4 py-3 text-left hidden md:table-cell">タイプ</th>
+                <th class="px-4 py-3 text-center">当選率</th>
+                <th class="px-4 py-3 text-center">状態</th>
+                <th class="px-4 py-3 text-right">操作</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+            {% for game in games %}
+            <tr class="hover:bg-gray-50">
+                <td class="px-4 py-3">
+                    <div class="font-medium text-gray-800">{{ game.name }}</div>
+                    <div class="text-xs text-gray-400 md:hidden">{{ game.game_type }}</div>
+                </td>
+                <td class="px-4 py-3 hidden md:table-cell">
+                    <span class="px-2 py-0.5 rounded text-xs font-medium
+                        {% if game.game_type == 'scratch' %}bg-yellow-100 text-yellow-700
+                        {% elif game.game_type == 'roulette' %}bg-blue-100 text-blue-700
+                        {% else %}bg-purple-100 text-purple-700{% endif %}">
+                        {{ game.game_type }}
+                    </span>
+                </td>
+                <td class="px-4 py-3 text-center">{{ (game.win_rate * 100) | int }}%</td>
+                <td class="px-4 py-3 text-center">
+                    <form method="POST" action="{{ url_for('admin.games_toggle', game_id=game.id) }}" class="inline">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" class="px-2 py-0.5 rounded text-xs font-bold
+                            {% if game.is_active %}bg-green-100 text-green-700{% else %}bg-gray-100 text-gray-500{% endif %}">
+                            {{ '有効' if game.is_active else '無効' }}
+                        </button>
+                    </form>
+                </td>
+                <td class="px-4 py-3 text-right space-x-1">
+                    <a href="{{ url_for('admin.games_edit', game_id=game.id) }}" class="text-gray-500 hover:text-primary text-xs">編集</a>
+                    {% if game.game_type == 'quiz' %}
+                    <a href="{{ url_for('admin.games_questions', game_id=game.id) }}" class="text-gray-500 hover:text-primary text-xs">問題</a>
+                    {% endif %}
+                    <form method="POST" action="{{ url_for('admin.games_delete', game_id=game.id) }}" class="inline" onsubmit="return confirm('削除しますか?')">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button class="text-red-400 hover:text-red-600 text-xs">削除</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

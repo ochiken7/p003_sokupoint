@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% block title %}ログインボーナス - 即ポイントクラブ{% endblock %}
+
+{% block content %}
+<div class="text-center mb-6">
+    <i data-lucide="gift" class="w-16 h-16 text-primary mx-auto mb-3"></i>
+    <h1 class="text-xl font-bold text-gray-800">ログインボーナス</h1>
+    <p class="text-sm text-gray-500 mt-1">毎日ログインしてポイントをGET!</p>
+</div>
+
+<!-- 連続ログイン状況 -->
+<div class="card mb-4">
+    <div class="flex items-center justify-between mb-3">
+        <span class="text-sm font-medium text-gray-600">連続ログイン</span>
+        <span class="text-lg font-bold text-primary">{{ user.consecutive_login_days }}日</span>
+    </div>
+    <!-- 7日間のドット表示 -->
+    <div class="flex justify-between gap-1">
+        {% for i in range(1, 8) %}
+        <div class="flex-1 text-center">
+            <div class="w-8 h-8 mx-auto rounded-full flex items-center justify-center text-xs font-bold
+                {% if i <= (user.consecutive_login_days % 7 or 7) %}
+                    bg-primary text-white
+                {% else %}
+                    bg-gray-100 text-gray-400
+                {% endif %}">
+                {{ i }}
+            </div>
+            {% if i == 7 %}
+            <div class="text-xs text-accent1 mt-1 font-bold">+100P</div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- ボーナス受取 -->
+<div class="card text-center">
+    {% if already_received %}
+        <div class="py-4">
+            <i data-lucide="check-circle" class="w-12 h-12 text-success mx-auto mb-2"></i>
+            <p class="text-lg font-bold text-gray-800">本日は受取済みです</p>
+            <p class="text-sm text-gray-500 mt-1">明日もログインしてボーナスを受け取りましょう!</p>
+        </div>
+    {% else %}
+        <div class="py-4">
+            <p class="text-sm text-gray-500 mb-2">本日のボーナス</p>
+            <p class="text-3xl font-bold text-primary mb-1">{{ base_points }}P</p>
+            <p class="text-xs text-gray-400 mb-4">
+                (ランク倍率 x{{ user.rank.bonus_multiplier }} 適用)
+            </p>
+            <form method="POST" action="{{ url_for('login_bonus.receive') }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn-primary text-lg px-8 py-3">
+                    ボーナスを受け取る
+                </button>
+            </form>
+        </div>
+    {% endif %}
+</div>
+
+<!-- ボーナステーブル -->
+<div class="mt-6">
+    <h2 class="text-sm font-bold text-gray-700 mb-2 flex items-center gap-1">
+        <i data-lucide="info" class="w-4 h-4 text-gray-400"></i>
+        ボーナス一覧
+    </h2>
+    <div class="bg-off-white rounded-lg p-3 text-sm">
+        <div class="flex justify-between py-1 border-b border-border_pink">
+            <span class="text-gray-600">通常</span><span class="font-bold">50P</span>
+        </div>
+        <div class="flex justify-between py-1 border-b border-border_pink">
+            <span class="text-gray-600">7日連続</span><span class="font-bold text-accent1">100P</span>
+        </div>
+        <div class="flex justify-between py-1 border-b border-border_pink">
+            <span class="text-gray-600">14日連続</span><span class="font-bold text-accent1">200P</span>
+        </div>
+        <div class="flex justify-between py-1">
+            <span class="text-gray-600">30日連続</span><span class="font-bold text-primary">500P</span>
+        </div>
+    </div>
+</div>
+{% endblock %}

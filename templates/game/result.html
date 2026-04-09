@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block title %}結果 - {{ game.name }} - 即ポイントクラブ{% endblock %}
+
+{% block content %}
+<div class="text-center py-8">
+    {% if result == 'win' %}
+    <div class="mb-4">
+        <i data-lucide="party-popper" class="w-20 h-20 text-primary mx-auto"></i>
+    </div>
+    <h1 class="text-2xl font-bold text-primary mb-2">当たり!</h1>
+    {% else %}
+    <div class="mb-4">
+        <i data-lucide="meh" class="w-20 h-20 text-gray-400 mx-auto"></i>
+    </div>
+    <h1 class="text-2xl font-bold text-gray-600 mb-2">残念...</h1>
+    {% endif %}
+
+    <div class="card inline-block px-8 py-4 mb-6">
+        <p class="text-sm text-gray-500">獲得ポイント</p>
+        <p class="text-3xl font-bold text-primary">+{{ points }}P</p>
+        {% if result == 'lose' %}
+        <p class="text-xs text-gray-400 mt-1">参加賞</p>
+        {% endif %}
+    </div>
+
+    <div class="space-y-3">
+        <a href="{{ url_for('game.index') }}"
+           class="block btn-primary mx-auto" style="max-width: 280px;">
+            ゲーム一覧に戻る
+        </a>
+        <a href="{{ url_for('home.index') }}"
+           class="block text-sm text-gray-500 hover:text-primary transition-colors">
+            ホームに戻る
+        </a>
+    </div>
+</div>
+{% endblock %}

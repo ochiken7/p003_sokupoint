@@ -1,0 +1,116 @@
+<!-- クイズゲーム -->
+<div class="card" id="quiz-game">
+    <div id="quiz-container"></div>
+
+    <form method="POST" action="{{ url_for('game.result', game_id=game.id) }}" id="quiz-form" class="hidden">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="correct_count" id="correct-count" value="0">
+        <input type="hidden" name="total" id="total-count" value="0">
+        <div class="text-center mt-4">
+            <button type="submit" class="btn-primary text-lg px-8 py-3">結果を確認する</button>
+        </div>
+    </form>
+</div>
+
+{% block scripts %}
+<script>
+(function() {
+    const questions = [
+        {% for q in questions %}
+        {
+            text: {{ q.question_text | tojson }},
+            choices: [{{ q.choice_1 | tojson }}, {{ q.choice_2 | tojson }}, {{ q.choice_3 | tojson }}, {{ q.choice_4 | tojson }}],
+            correct: {{ q.correct_choice }},
+            explanation: {{ q.explanation | tojson }}
+        }{{ ',' if not loop.last }}
+        {% endfor %}
+    ];
+
+    let currentIdx = 0;
+    let correctCount = 0;
+    const container = document.getElementById('quiz-container');
+    const form = document.getElementById('quiz-form');
+
+    document.getElementById('total-count').value = questions.length;
+
+    function showQuestion() {
+        if (currentIdx >= questions.length) {
+            showComplete();
+            return;
+        }
+        const q = questions[currentIdx];
+        container.innerHTML = `
+            <div class="mb-3">
+                <span class="text-xs text-gray-400">Q${currentIdx + 1} / ${questions.length}</span>
+                <div class="w-full bg-gray-100 rounded-full h-1.5 mt-1">
+                    <div class="bg-primary h-1.5 rounded-full" style="width: ${(currentIdx / questions.length) * 100}%"></div>
+                </div>
+            </div>
+            <h2 class="text-lg font-bold text-gray-800 mb-4">${q.text}</h2>
+            <div class="space-y-2" id="choices">
+                ${q.choices.map((c, i) => `
+                    <button type="button" onclick="selectAnswer(${i + 1})"
+                        class="w-full text-left p-3 rounded-lg border border-border_pink hover:border-primary transition-colors text-sm font-medium"
+                        data-choice="${i + 1}">
+                        <span class="inline-block w-6 h-6 rounded-full bg-off-white text-center text-xs leading-6 mr-2 font-bold">${i + 1}</span>
+                        ${c}
+                    </button>
+                `).join('')}
+            </div>
+        `;
+    }
+
+    window.selectAnswer = function(choice) {
+        const q = questions[currentIdx];
+        const buttons = document.querySelectorAll('#choices button');
+        buttons.forEach(b => {
+            b.disabled = true;
+            b.classList.remove('hover:border-primary');
+            const c = parseInt(b.dataset.choice);
+            if (c === q.correct) {
+                b.classList.add('border-green-500', 'bg-green-50');
+            } else if (c === choice && c !== q.correct) {
+                b.classList.add('border-red-500', 'bg-red-50');
+            }
+        });
+
+        if (choice === q.correct) correctCount++;
+
+        // 解説を表示
+        const explanation = document.createElement('div');
+        explanation.className = 'mt-3 p-3 bg-off-white rounded-lg text-sm text-gray-600';
+        explanation.innerHTML = `<span class="font-bold ${choice === q.correct ? 'text-success' : 'text-red-500'}">${choice === q.correct ? '正解!' : '不正解...'}</span> ${q.explanation}`;
+        container.appendChild(explanation);
+
+        // 次の問題へ
+        const nextBtn = document.createElement('button');
+        nextBtn.type = 'button';
+        nextBtn.className = 'btn-primary w-full mt-3';
+        nextBtn.textContent = currentIdx + 1 < questions.length ? '次の問題へ' : '結果を見る';
+        nextBtn.onclick = function() { currentIdx++; showQuestion(); };
+        container.appendChild(nextBtn);
+    };
+
+    function showComplete() {
+        document.getElementById('correct-count').value = correctCount;
+        const allCorrect = correctCount === questions.length;
+        container.innerHTML = `
+            <div class="text-center py-6">
+                <i data-lucide="${allCorrect ? 'party-popper' : 'frown'}"
+                   class="w-16 h-16 ${allCorrect ? 'text-primary' : 'text-gray-400'} mx-auto mb-3"></i>
+                <h2 class="text-xl font-bold text-gray-800">
+                    ${correctCount} / ${questions.length} 問正解
+                </h2>
+                <p class="text-sm text-gray-500 mt-1">
+                    ${allCorrect ? '全問正解! ボーナスポイント獲得!' : '惜しい! 参加賞ポイントをGET!'}
+                </p>
+            </div>
+        `;
+        form.classList.remove('hidden');
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+    }
+
+    showQuestion();
+})();
+</script>
+{% endblock %}

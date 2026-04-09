@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+
+{% block title %}ホーム - 即ポイントクラブ{% endblock %}
+
+{% block content %}
+<!-- ユーザー情報カード -->
+<div class="card mb-4">
+    <div class="flex items-center gap-4">
+        <div class="w-14 h-14 rounded-full flex items-center justify-center flex-shrink-0"
+             style="background-color: {{ user.rank.color }}20;">
+            <i data-lucide="user" class="w-7 h-7" style="color: {{ user.rank.color }};"></i>
+        </div>
+        <div class="flex-1">
+            <div class="flex items-center gap-2">
+                <span class="font-bold text-lg text-gray-800">{{ user.nickname }}</span>
+                <span class="rank-badge" style="background-color: {{ user.rank.color }};">
+                    {{ user.rank.name }}
+                </span>
+            </div>
+            <div class="flex items-center gap-4 mt-1 text-sm text-gray-500">
+                <span class="flex items-center gap-1">
+                    <i data-lucide="coins" class="w-4 h-4 text-primary"></i>
+                    <span class="font-bold text-primary">{{ '{:,}'.format(user.total_points) }}P</span>
+                </span>
+                <span class="flex items-center gap-1">
+                    <i data-lucide="calendar-check" class="w-4 h-4"></i>
+                    {{ user.consecutive_login_days }}日連続
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- バナーエリア -->
+{% set banner1 = get_asset('banner_home_1') %}
+{% set banner2 = get_asset('banner_home_2') %}
+{% if (banner1 and banner1.file_path) or (banner2 and banner2.file_path) %}
+<div class="mb-4 space-y-3">
+    {% if banner1 and banner1.file_path %}
+    <a href="{{ banner1.link_url or '#' }}" class="block">
+        <img src="{{ url_for('static', filename=banner1.file_path) }}" alt="{{ banner1.alt_text }}"
+             class="w-full rounded-xl object-cover" style="max-height: 180px;">
+    </a>
+    {% endif %}
+    {% if banner2 and banner2.file_path %}
+    <a href="{{ banner2.link_url or '#' }}" class="block">
+        <img src="{{ url_for('static', filename=banner2.file_path) }}" alt="{{ banner2.alt_text }}"
+             class="w-full rounded-xl object-cover" style="max-height: 180px;">
+    </a>
+    {% endif %}
+</div>
+{% endif %}
+
+<!-- 今日のタスク -->
+<h2 class="font-bold text-gray-800 mb-3 flex items-center gap-2">
+    <i data-lucide="list-checks" class="w-5 h-5 text-primary"></i>
+    今日のタスク
+</h2>
+
+<div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+    <!-- ログインボーナス -->
+    <a href="{{ url_for('login_bonus.index') }}" class="card text-center hover:border-primary transition-colors">
+        <i data-lucide="gift" class="w-8 h-8 text-primary mx-auto mb-2"></i>
+        <div class="text-xs font-medium text-gray-600">ログインボーナス</div>
+        <div class="text-xs text-accent1 mt-1 font-bold">受取可能</div>
+    </a>
+    <!-- ゲーム -->
+    <a href="{{ url_for('game.index') }}" class="card text-center hover:border-primary transition-colors">
+        <i data-lucide="gamepad-2" class="w-8 h-8 text-primary mx-auto mb-2"></i>
+        <div class="text-xs font-medium text-gray-600">ミニゲーム</div>
+        <div class="text-xs text-gray-400 mt-1">1日1回</div>
+    </a>
+    <!-- クーポン -->
+    <a href="{{ url_for('coupon.index') }}" class="card text-center hover:border-primary transition-colors">
+        <i data-lucide="ticket" class="w-8 h-8 text-primary mx-auto mb-2"></i>
+        <div class="text-xs font-medium text-gray-600">クーポン</div>
+        <div class="text-xs text-gray-400 mt-1">応募受付中</div>
+    </a>
+    <!-- チェックイン -->
+    <a href="{{ url_for('checkin.index') }}" class="card text-center hover:border-primary transition-colors">
+        <i data-lucide="map-pin" class="w-8 h-8 text-primary mx-auto mb-2"></i>
+        <div class="text-xs font-medium text-gray-600">チェックイン</div>
+        <div class="text-xs text-gray-400 mt-1">来店でポイント</div>
+    </a>
+</div>
+
+<!-- お知らせ風セクション -->
+<div class="bg-off-white rounded-xl p-4">
+    <h3 class="font-bold text-sm text-gray-700 mb-2 flex items-center gap-1">
+        <i data-lucide="bell" class="w-4 h-4 text-primary"></i>
+        お知らせ
+    </h3>
+    <ul class="text-sm text-gray-600 space-y-2">
+        <li class="flex items-start gap-2">
+            <span class="text-xs text-gray-400 flex-shrink-0 mt-0.5">04/09</span>
+            <span>即ポイントクラブ デモサイトがオープンしました!</span>
+        </li>
+        <li class="flex items-start gap-2">
+            <span class="text-xs text-gray-400 flex-shrink-0 mt-0.5">04/09</span>
+            <span>新ゲーム「ルーレットチャンス」が追加されました</span>
+        </li>
+    </ul>
+</div>
+{% endblock %}

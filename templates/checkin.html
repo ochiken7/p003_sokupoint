@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block title %}チェックイン - 即ポイントクラブ{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <h1 class="text-xl font-bold text-gray-800 flex items-center gap-2">
+        <i data-lucide="map-pin" class="w-6 h-6 text-primary"></i>
+        来店チェックイン
+    </h1>
+    <p class="text-sm text-gray-500 mt-1">店舗にチェックインして300P獲得!</p>
+</div>
+
+<div class="space-y-3">
+    {% for store in stores %}
+    <div class="card flex items-center gap-4">
+        <div class="w-12 h-12 rounded-full bg-off-white flex items-center justify-center flex-shrink-0">
+            <i data-lucide="map-pin" class="w-6 h-6 text-primary"></i>
+        </div>
+        <div class="flex-1">
+            <h3 class="font-bold text-gray-800">{{ store.name }}</h3>
+            <p class="text-xs text-gray-500">{{ store.area }}</p>
+        </div>
+        {% if store.id in checked_store_ids %}
+        <span class="text-xs bg-gray-200 text-gray-500 px-3 py-1.5 rounded-lg font-bold">
+            チェックイン済
+        </span>
+        {% else %}
+        <form method="POST" action="{{ url_for('checkin.do_checkin', store_id=store.id) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="text-sm text-white px-4 py-1.5 rounded-lg font-bold"
+                    style="background: linear-gradient(135deg, #E63946, #EF476F);">
+                チェックイン
+            </button>
+        </form>
+        {% endif %}
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

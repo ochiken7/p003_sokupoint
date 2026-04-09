@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block title %}ゲーム - 即ポイントクラブ{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <h1 class="text-xl font-bold text-gray-800 flex items-center gap-2">
+        <i data-lucide="gamepad-2" class="w-6 h-6 text-primary"></i>
+        ミニゲーム
+    </h1>
+    <p class="text-sm text-gray-500 mt-1">1日1回プレイしてポイントを獲得!</p>
+</div>
+
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+    {% for game in games %}
+    <div class="card relative">
+        {% if game.id in played_today %}
+        <div class="absolute top-2 right-2 bg-gray-400 text-white text-xs px-2 py-0.5 rounded-full font-bold">
+            プレイ済
+        </div>
+        {% endif %}
+
+        {% if game.thumbnail_path %}
+        <img src="{{ url_for('static', filename=game.thumbnail_path) }}" alt="{{ game.name }}"
+             class="w-full h-32 object-cover rounded-lg mb-3">
+        {% else %}
+        <div class="w-full h-32 bg-off-white rounded-lg mb-3 flex items-center justify-center">
+            {% if game.game_type == 'scratch' %}
+            <i data-lucide="ticket" class="w-12 h-12 text-primary"></i>
+            {% elif game.game_type == 'roulette' %}
+            <i data-lucide="disc-3" class="w-12 h-12 text-primary"></i>
+            {% elif game.game_type == 'quiz' %}
+            <i data-lucide="help-circle" class="w-12 h-12 text-primary"></i>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <h3 class="font-bold text-gray-800">{{ game.name }}</h3>
+        <p class="text-xs text-gray-500 mt-1 mb-3">{{ game.description }}</p>
+
+        {% if game.id in played_today %}
+        <button disabled class="w-full py-2 rounded-lg bg-gray-200 text-gray-400 font-bold text-sm cursor-not-allowed">
+            本日プレイ済み
+        </button>
+        {% else %}
+        <a href="{{ url_for('game.play', game_id=game.id) }}"
+           class="block w-full py-2 rounded-lg text-center text-white font-bold text-sm"
+           style="background: linear-gradient(135deg, #E63946, #EF476F);">
+            プレイする
+        </a>
+        {% endif %}
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

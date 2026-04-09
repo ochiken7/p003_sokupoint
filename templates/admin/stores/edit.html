@@ -1,0 +1,33 @@
+{% extends 'admin/base.html' %}
+{% block title %}{{ '店舗編集' if store else '店舗新規作成' }}{% endblock %}
+
+{% block content %}
+<h1 class="text-xl font-bold text-gray-800 mb-4">{{ '店舗編集' if store else '店舗新規作成' }}</h1>
+
+<form method="POST" class="bg-white rounded-xl border border-gray-200 p-6 space-y-4 max-w-md">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+    <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">店舗名</label>
+        <input type="text" name="name" value="{{ store.name if store else '' }}" required
+               class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30">
+    </div>
+
+    <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">エリア</label>
+        <input type="text" name="area" value="{{ store.area if store else '' }}"
+               class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30">
+    </div>
+
+    <div class="flex items-center gap-2">
+        <input type="checkbox" name="is_active" id="is_active" {{ 'checked' if not store or store.is_active }}
+               class="w-4 h-4 text-primary rounded">
+        <label for="is_active" class="text-sm text-gray-700">有効にする</label>
+    </div>
+
+    <div class="flex gap-3 pt-2">
+        <button type="submit" class="bg-primary text-white px-6 py-2 rounded-lg text-sm font-bold hover:opacity-90">保存</button>
+        <a href="{{ url_for('admin.stores_list') }}" class="px-6 py-2 rounded-lg text-sm text-gray-600 border border-gray-300 hover:bg-gray-50">キャンセル</a>
+    </div>
+</form>
+{% endblock %}

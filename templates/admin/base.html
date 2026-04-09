@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}管理画面{% endblock %} - 即ポイントクラブ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: { extend: { colors: {
+                primary: '#E63946', accent1: '#EF476F', accent2: '#FFB4BA',
+                'off-white': '#FFF5F5', border_pink: '#FCE4E8',
+            } } }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
+</head>
+<body class="font-['Noto_Sans_JP','Inter',sans-serif] bg-gray-50 text-gray-800">
+    <!-- SP ヘッダー -->
+    <header class="bg-white border-b border-gray-200 sticky top-0 z-50">
+        <div class="flex items-center justify-between px-4 h-14">
+            <div class="flex items-center gap-3">
+                <button onclick="document.getElementById('sidebar').classList.toggle('-translate-x-full')"
+                        class="md:hidden">
+                    <i data-lucide="menu" class="w-6 h-6 text-gray-600"></i>
+                </button>
+                <a href="{{ url_for('admin.dashboard') }}" class="font-bold text-primary text-lg">
+                    管理画面
+                </a>
+            </div>
+            <div class="flex items-center gap-3 text-sm">
+                <a href="{{ url_for('home.index') }}" class="text-gray-500 hover:text-primary flex items-center gap-1">
+                    <i data-lucide="external-link" class="w-4 h-4"></i>サイト表示
+                </a>
+                <a href="{{ url_for('admin.logout') }}" class="text-gray-500 hover:text-red-500 flex items-center gap-1">
+                    <i data-lucide="log-out" class="w-4 h-4"></i>ログアウト
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex">
+        <!-- サイドバー -->
+        <aside id="sidebar" class="fixed md:sticky top-14 left-0 w-56 h-[calc(100vh-3.5rem)] bg-white border-r border-gray-200 z-40 transition-transform -translate-x-full md:translate-x-0 overflow-y-auto">
+            <nav class="p-3 space-y-1 text-sm">
+                {% set nav_items = [
+                    ('admin.dashboard', 'layout-dashboard', 'ダッシュボード'),
+                    ('admin.games_list', 'gamepad-2', 'ゲーム管理'),
+                    ('admin.coupons_list', 'ticket', 'クーポン管理'),
+                    ('admin.stores_list', 'map-pin', '店舗管理'),
+                    ('admin.trophies_list', 'trophy', 'トロフィー管理'),
+                    ('admin.users_list', 'users', 'ユーザー管理'),
+                    ('admin.assets_manage', 'image', 'サイト画像設定'),
+                ] %}
+                {% for endpoint, icon, label in nav_items %}
+                <a href="{{ url_for(endpoint) }}"
+                   class="flex items-center gap-2 px-3 py-2 rounded-lg transition-colors
+                   {% if request.endpoint == endpoint %}bg-primary/10 text-primary font-bold{% else %}text-gray-600 hover:bg-gray-100{% endif %}">
+                    <i data-lucide="{{ icon }}" class="w-4 h-4"></i>{{ label }}
+                </a>
+                {% endfor %}
+            </nav>
+        </aside>
+
+        <!-- メインコンテンツ -->
+        <main class="flex-1 p-4 md:p-6 min-h-[calc(100vh-3.5rem)] max-w-5xl">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            <div class="mb-4">
+                {% for cat, msg in messages %}
+                <div class="rounded-lg px-4 py-2 mb-2 text-sm flex items-center gap-2
+                    {% if cat == 'success' %}bg-green-50 text-green-700 border border-green-200
+                    {% elif cat == 'error' %}bg-red-50 text-red-700 border border-red-200
+                    {% else %}bg-blue-50 text-blue-700 border border-blue-200{% endif %}">
+                    {{ msg }}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            {% endwith %}
+
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+
+    <script>lucide.createIcons();</script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,43 @@
+{% extends 'admin/base.html' %}
+{% block title %}ダッシュボード{% endblock %}
+
+{% block content %}
+<h1 class="text-xl font-bold text-gray-800 mb-4">ダッシュボード</h1>
+
+<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 mb-6">
+    {% set cards = [
+        ('users', stats.user_count, 'ユーザー', 'users'),
+        ('gamepad-2', stats.play_count, 'ゲームプレイ', 'game_plays'),
+        ('ticket', stats.entry_count, 'クーポン応募', 'entries'),
+        ('map-pin', stats.checkin_count, 'チェックイン', 'checkins'),
+        ('trophy', stats.trophy_count, 'トロフィー獲得', 'trophies'),
+    ] %}
+    {% for icon, count, label, _ in cards %}
+    <div class="bg-white rounded-xl border border-gray-200 p-4 text-center">
+        <i data-lucide="{{ icon }}" class="w-6 h-6 text-primary mx-auto mb-2"></i>
+        <div class="text-2xl font-bold text-gray-800">{{ count }}</div>
+        <div class="text-xs text-gray-500">{{ label }}</div>
+    </div>
+    {% endfor %}
+</div>
+
+<h2 class="font-bold text-gray-800 mb-3">クイックアクセス</h2>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+    <a href="{{ url_for('admin.games_list') }}" class="bg-white rounded-xl border border-gray-200 p-4 hover:border-primary transition-colors text-center">
+        <i data-lucide="gamepad-2" class="w-8 h-8 text-primary mx-auto mb-1"></i>
+        <div class="text-sm font-medium">ゲーム管理</div>
+    </a>
+    <a href="{{ url_for('admin.assets_manage') }}" class="bg-white rounded-xl border border-gray-200 p-4 hover:border-primary transition-colors text-center">
+        <i data-lucide="image" class="w-8 h-8 text-primary mx-auto mb-1"></i>
+        <div class="text-sm font-medium">画像差替</div>
+    </a>
+    <a href="{{ url_for('admin.coupons_list') }}" class="bg-white rounded-xl border border-gray-200 p-4 hover:border-primary transition-colors text-center">
+        <i data-lucide="ticket" class="w-8 h-8 text-primary mx-auto mb-1"></i>
+        <div class="text-sm font-medium">クーポン管理</div>
+    </a>
+    <a href="{{ url_for('admin.users_list') }}" class="bg-white rounded-xl border border-gray-200 p-4 hover:border-primary transition-colors text-center">
+        <i data-lucide="users" class="w-8 h-8 text-primary mx-auto mb-1"></i>
+        <div class="text-sm font-medium">ユーザー管理</div>
+    </a>
+</div>
+{% endblock %}

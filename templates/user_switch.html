@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ユーザー選択 - 即ポイントクラブ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: { extend: { colors: {
+                primary: '#E63946', accent1: '#EF476F', accent2: '#FFB4BA', border_pink: '#FCE4E8'
+            } } }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="font-['Noto_Sans_JP'] bg-white min-h-screen flex items-center justify-center">
+    <div class="px-6 w-full max-w-md">
+        <div class="text-center mb-8">
+            <h1 class="text-2xl font-bold text-gray-800 mb-1">デモユーザー選択</h1>
+            <p class="text-gray-500 text-sm">体験するユーザーを選んでください</p>
+        </div>
+
+        <div class="space-y-3">
+            {% for user in users %}
+            <form method="POST" action="{{ url_for('auth.switch_user', user_id=user.id) }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="w-full bg-white border border-border_pink rounded-xl p-4 flex items-center gap-4 hover:border-primary hover:shadow-md transition-all text-left">
+                    <!-- ランクアイコン -->
+                    <div class="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0"
+                         style="background-color: {{ user.rank.color }}20;">
+                        <i data-lucide="user" class="w-6 h-6" style="color: {{ user.rank.color }};"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="font-bold text-gray-800">{{ user.nickname }}</div>
+                        <div class="flex items-center gap-2 mt-1">
+                            <span class="inline-block px-2 py-0.5 rounded-full text-xs font-bold text-white"
+                                  style="background-color: {{ user.rank.color }};">
+                                {{ user.rank.name }}
+                            </span>
+                            <span class="text-xs text-gray-500">{{ '{:,}'.format(user.total_points) }}P</span>
+                        </div>
+                    </div>
+                    <i data-lucide="chevron-right" class="w-5 h-5 text-gray-300 flex-shrink-0"></i>
+                </button>
+            </form>
+            {% endfor %}
+        </div>
+    </div>
+    <script>lucide.createIcons();</script>
+</body>
+</html>

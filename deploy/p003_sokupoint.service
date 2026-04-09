@@ -1,0 +1,16 @@
+[Unit]
+Description=p003_sokupoint - Soku Point Club Prototype
+After=network.target
+
+[Service]
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/p003_sokupoint
+Environment="PATH=/var/www/p003_sokupoint/venv/bin"
+EnvironmentFile=/var/www/p003_sokupoint/.env
+ExecStart=/var/www/p003_sokupoint/venv/bin/gunicorn -c gunicorn_config.py wsgi:app
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

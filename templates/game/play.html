@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block title %}{{ game.name }} - 即ポイントクラブ{% endblock %}
+
+{% block content %}
+<div class="text-center mb-4">
+    <h1 class="text-xl font-bold text-gray-800">{{ game.name }}</h1>
+    <p class="text-sm text-gray-500">{{ game.description }}</p>
+</div>
+
+{% include game_template %}
+{% endblock %}
