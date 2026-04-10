@@ -3,24 +3,25 @@
 
 {% block content %}
 <div class="text-center py-8">
-    {% if result == 'win' %}
+    {% if points > 10 %}
     <div class="mb-4">
         <i data-lucide="party-popper" class="w-20 h-20 text-primary mx-auto"></i>
     </div>
-    <h1 class="text-2xl font-bold text-primary mb-2">当たり!</h1>
+    {% elif points > 0 %}
+    <div class="mb-4">
+        <i data-lucide="smile" class="w-20 h-20 text-accent1 mx-auto"></i>
+    </div>
     {% else %}
     <div class="mb-4">
         <i data-lucide="meh" class="w-20 h-20 text-gray-400 mx-auto"></i>
     </div>
-    <h1 class="text-2xl font-bold text-gray-600 mb-2">残念...</h1>
     {% endif %}
+
+    <h1 class="text-2xl font-bold text-gray-800 mb-2">{{ label }}</h1>
 
     <div class="card inline-block px-8 py-4 mb-6">
         <p class="text-sm text-gray-500">獲得ポイント</p>
         <p class="text-3xl font-bold text-primary">+{{ points }}P</p>
-        {% if result == 'lose' %}
-        <p class="text-xs text-gray-400 mt-1">参加賞</p>
-        {% endif %}
     </div>
 
     <div class="space-y-3">

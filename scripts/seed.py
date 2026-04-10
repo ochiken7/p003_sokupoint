@@ -8,7 +8,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 
 from app import create_app, db
 from models import (
-    User, Rank, Game, QuizQuestion, Coupon, Store, Trophy, SiteAsset
+    User, Rank, Game, GameOutcome, QuizQuestion, Coupon, Store, Trophy, SiteAsset
 )
 
 
@@ -48,40 +48,34 @@ def seed():
                 name='今日のスクラッチ', game_type='scratch',
                 description='カードを削って当たりを狙おう!',
                 is_active=True, priority=1,
-                win_rate=0.3, points_on_win_min=10, points_on_win_max=100,
-                points_on_lose=1,
             ),
             Game(
                 name='ルーレットチャンス', game_type='roulette',
                 description='ルーレットを回してポイントGET!',
                 is_active=True, priority=2,
-                win_rate=0.25, points_on_win_min=20, points_on_win_max=200,
-                points_on_lose=1,
-                config_json=json.dumps({
-                    'segments': [
-                        {'label': '20P', 'color': '#EF476F'},
-                        {'label': 'ハズレ', 'color': '#6B7280'},
-                        {'label': '50P', 'color': '#E63946'},
-                        {'label': 'ハズレ', 'color': '#6B7280'},
-                        {'label': '100P', 'color': '#F5C542'},
-                        {'label': 'ハズレ', 'color': '#6B7280'},
-                        {'label': '200P', 'color': '#10B981'},
-                        {'label': 'ハズレ', 'color': '#6B7280'},
-                    ]
-                }),
             ),
             Game(
                 name='クイズに挑戦', game_type='quiz',
-                description='3問正解でボーナスポイント!',
+                description='3問正解で1等!',
                 is_active=True, priority=3,
-                win_rate=1.0,  # クイズは正解判定で決まるので win_rate=1.0
-                points_on_win_min=50, points_on_win_max=50,
-                points_on_lose=5,
                 config_json=json.dumps({'shuffle': True}),
             ),
         ]
         db.session.add_all(games)
         db.session.flush()  # IDを確定
+
+        # === ゲーム結果（各ゲーム6通り） ===
+        default_outcomes = [
+            {'position': 1, 'label': '1等', 'points': 500, 'weight': 1.0, 'color': '#E63946'},
+            {'position': 2, 'label': '2等', 'points': 200, 'weight': 5.0, 'color': '#EF476F'},
+            {'position': 3, 'label': '3等', 'points': 100, 'weight': 10.0, 'color': '#F5C542'},
+            {'position': 4, 'label': '4等', 'points': 50, 'weight': 20.0, 'color': '#10B981'},
+            {'position': 5, 'label': '5等', 'points': 10, 'weight': 30.0, 'color': '#6B7280'},
+            {'position': 6, 'label': 'はずれ', 'points': 1, 'weight': 34.0, 'color': '#9CA3AF'},
+        ]
+        for g in games:
+            for d in default_outcomes:
+                db.session.add(GameOutcome(game_id=g.id, **d))
 
         # === クイズ問題（3問） ===
         quiz_game = games[2]

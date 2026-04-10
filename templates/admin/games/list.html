@@ -15,7 +15,7 @@
             <tr>
                 <th class="px-4 py-3 text-left">ゲーム名</th>
                 <th class="px-4 py-3 text-left hidden md:table-cell">タイプ</th>
-                <th class="px-4 py-3 text-center">当選率</th>
+                <th class="px-4 py-3 text-center hidden sm:table-cell">1等</th>
                 <th class="px-4 py-3 text-center">状態</th>
                 <th class="px-4 py-3 text-right">操作</th>
             </tr>
@@ -35,7 +35,10 @@
                         {{ game.game_type }}
                     </span>
                 </td>
-                <td class="px-4 py-3 text-center">{{ (game.win_rate * 100) | int }}%</td>
+                <td class="px-4 py-3 text-center hidden sm:table-cell text-xs text-gray-600">
+                    {% set first_outcome = game.outcomes.filter_by(position=1).first() %}
+                    {% if first_outcome %}{{ first_outcome.label }} / {{ first_outcome.points }}P{% else %}-{% endif %}
+                </td>
                 <td class="px-4 py-3 text-center">
                     <form method="POST" action="{{ url_for('admin.games_toggle', game_id=game.id) }}" class="inline">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">

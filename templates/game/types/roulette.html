@@ -1,7 +1,6 @@
-<!-- ルーレットゲーム -->
+<!-- ルーレットゲーム (6セグメント) -->
 <div class="card text-center" id="roulette-game">
     <div class="relative mx-auto mb-4" style="width: 280px; height: 280px;">
-        <!-- 矢印 -->
         <div class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1 z-10">
             <i data-lucide="triangle" class="w-8 h-8 text-primary fill-primary"></i>
         </div>
@@ -23,8 +22,13 @@
 (function() {
     const canvas = document.getElementById('roulette-canvas');
     const ctx = canvas.getContext('2d');
-    const segments = {{ config.get('segments', []) | tojson }};
-    const segCount = segments.length || 8;
+    // 6つの結果をサーバーから取得
+    const segments = [
+        {% for o in outcomes %}
+        { label: {{ o.label | tojson }}, color: {{ o.color | tojson }}, points: {{ o.points }} }{{ ',' if not loop.last }}
+        {% endfor %}
+    ];
+    const segCount = segments.length || 6;
     const segAngle = (2 * Math.PI) / segCount;
     let rotation = 0;
 
@@ -41,7 +45,7 @@
             ctx.moveTo(0, 0);
             ctx.arc(0, 0, 130, start, end);
             ctx.closePath();
-            ctx.fillStyle = segments[i] ? segments[i].color : (i % 2 ? '#6B7280' : '#E63946');
+            ctx.fillStyle = segments[i] ? segments[i].color : '#6B7280';
             ctx.fill();
             ctx.strokeStyle = '#fff';
             ctx.lineWidth = 2;
@@ -52,8 +56,10 @@
             ctx.rotate(start + segAngle / 2);
             ctx.textAlign = 'center';
             ctx.fillStyle = '#fff';
-            ctx.font = 'bold 12px "Noto Sans JP"';
-            ctx.fillText(segments[i] ? segments[i].label : '', 80, 5);
+            ctx.font = 'bold 13px "Noto Sans JP"';
+            ctx.fillText(segments[i] ? segments[i].label : '', 85, 0);
+            ctx.font = 'bold 11px "Noto Sans JP"';
+            ctx.fillText((segments[i].points || 0) + 'P', 85, 15);
             ctx.restore();
         }
 
@@ -61,7 +67,7 @@
 
         // 中心円
         ctx.beginPath();
-        ctx.arc(140, 140, 20, 0, Math.PI * 2);
+        ctx.arc(140, 140, 22, 0, Math.PI * 2);
         ctx.fillStyle = '#fff';
         ctx.fill();
         ctx.strokeStyle = '#E63946';

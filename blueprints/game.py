@@ -1,10 +1,10 @@
 import json
 from datetime import date
-from flask import Blueprint, render_template, session, redirect, url_for, flash, request, jsonify
+from flask import Blueprint, render_template, session, redirect, url_for, flash, request
 from extensions import db
 from models.user import User
 from models.game import Game, GamePlayLog, QuizQuestion
-from services.game_engine import get_template, can_play_today, determine_result
+from services.game_engine import get_template, can_play_today, determine_result, get_outcomes
 from services.point_service import add_points
 
 game_bp = Blueprint('game', __name__)
@@ -19,7 +19,6 @@ def index():
     games = Game.query.filter_by(is_active=True).order_by(Game.priority).all()
     today = date.today()
 
-    # 各ゲームのプレイ済み状態を取得
     played_today = set()
     logs = GamePlayLog.query.filter_by(user_id=user_id, played_date=today).all()
     for log in logs:
@@ -45,7 +44,6 @@ def play(game_id):
         flash('このゲームは本日プレイ済みです。', 'warning')
         return redirect(url_for('game.index'))
 
-    # クイズの場合は問題データも渡す
     questions = []
     if game.game_type == 'quiz':
         questions = QuizQuestion.query.filter_by(game_id=game_id).all()
@@ -54,10 +52,14 @@ def play(game_id):
     if game.config_json:
         config = json.loads(game.config_json)
 
+    # 6つの結果を取得（ルーレット等で使用）
+    outcomes = get_outcomes(game_id)
+
     template = get_template(game)
     return render_template('game/play.html',
                            game=game, user=user,
                            questions=questions, config=config,
+                           outcomes=outcomes,
                            game_template=template)
 
 
@@ -74,34 +76,32 @@ def result(game_id):
         flash('このゲームは本日プレイ済みです。', 'warning')
         return redirect(url_for('game.index'))
 
-    # クイズの場合は正解判定
+    # クイズ: 正解数を渡す / その他: 重み付き抽選
+    quiz_correct = None
+    quiz_total = None
     if game.game_type == 'quiz':
-        correct_count = int(request.form.get('correct_count', 0))
-        total = int(request.form.get('total', 0))
-        is_win = correct_count == total and total > 0
-        result_text = 'win' if is_win else 'lose'
-        if is_win:
-            points = game.points_on_win_min
-        else:
-            points = game.points_on_lose
-    else:
-        result_text, points = determine_result(game, user)
+        quiz_correct = int(request.form.get('correct_count', 0))
+        quiz_total = int(request.form.get('total', 0))
+
+    position, points, label = determine_result(game, user,
+                                                quiz_correct_count=quiz_correct,
+                                                quiz_total=quiz_total)
 
     # プレイログ記録
     log = GamePlayLog(
         user_id=user_id,
         game_id=game_id,
         played_date=date.today(),
-        result=result_text,
+        outcome_position=position,
+        result_label=label,
         points_awarded=points,
     )
     db.session.add(log)
     db.session.commit()
 
     # ポイント付与
-    actual = add_points(user_id, points, 'game',
-                        f'{game.name}({result_text})')
+    actual = add_points(user_id, points, 'game', f'{game.name}「{label}」')
 
     return render_template('game/result.html',
-                           game=game, result=result_text,
+                           game=game, label=label, position=position,
                            points=actual, user=user)
