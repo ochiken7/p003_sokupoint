@@ -1,11 +1,11 @@
 <header class="bg-white border-b border-border_pink sticky top-0 z-50">
-    <div class="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
+    <div class="max-w-5xl mx-auto px-4 h-16 md:h-20 flex items-center justify-between">
         <a href="{{ url_for('home.index') }}" class="flex items-center gap-2">
             {% set logo = get_asset('logo_header') %}
             {% if logo and logo.file_path %}
-                <img src="{{ url_for('static', filename=logo.file_path) }}" alt="{{ logo.alt_text }}" class="h-8">
+                <img src="{{ url_for('static', filename=logo.file_path) }}?v={{ logo.updated_at.timestamp() | int if logo.updated_at else '' }}" alt="{{ logo.alt_text }}" class="h-12 md:h-16">
             {% else %}
-                <span class="text-primary font-bold text-lg">即ポイントクラブ</span>
+                <span class="text-primary font-bold text-xl md:text-2xl">即ポイントクラブ</span>
             {% endif %}
         </a>
 
