@@ -10,4 +10,5 @@ class SiteAsset(db.Model):
     file_path = db.Column(db.Text)
     alt_text = db.Column(db.Text)
     link_url = db.Column(db.Text)
+    content_html = db.Column(db.Text)  # カスタムHTMLコンテンツ
     updated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)

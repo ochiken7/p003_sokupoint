@@ -2,6 +2,18 @@
 
 {% block title %}ホーム - 即ポイントクラブ{% endblock %}
 
+{# --- バナー表示用マクロ --- #}
+{% macro banner_img(slot_key, ratio) %}
+    {% set asset = get_asset(slot_key) %}
+    {% if asset and asset.file_path %}
+    <a href="{{ asset.link_url or '#' }}" class="block">
+        <img src="{{ url_for('static', filename=asset.file_path) }}?v={{ asset.updated_at.timestamp() | int if asset.updated_at else '' }}"
+             alt="{{ asset.alt_text }}"
+             class="w-full rounded-xl object-cover" style="aspect-ratio: {{ ratio }};">
+    </a>
+    {% endif %}
+{% endmacro %}
+
 {% block content %}
 <!-- ユーザー情報カード -->
 <div class="card mb-4">
@@ -31,25 +43,13 @@
     </div>
 </div>
 
-<!-- ===== 上部バナーエリア（2枠） ===== -->
-{% set banner1 = get_asset('banner_home_1') %}
-{% set banner2 = get_asset('banner_home_2') %}
-{% if (banner1 and banner1.file_path) or (banner2 and banner2.file_path) %}
+<!-- ===== 上部バナー（2枠: 1200x400） ===== -->
+{% set b1 = get_asset('banner_home_1') %}
+{% set b2 = get_asset('banner_home_2') %}
+{% if (b1 and b1.file_path) or (b2 and b2.file_path) %}
 <div class="mb-4 space-y-3">
-    {% if banner1 and banner1.file_path %}
-    <a href="{{ banner1.link_url or '#' }}" class="block">
-        <img src="{{ url_for('static', filename=banner1.file_path) }}?v={{ banner1.updated_at.timestamp() | int if banner1.updated_at else '' }}"
-             alt="{{ banner1.alt_text }}"
-             class="w-full rounded-xl object-cover" style="aspect-ratio: 3/1;">
-    </a>
-    {% endif %}
-    {% if banner2 and banner2.file_path %}
-    <a href="{{ banner2.link_url or '#' }}" class="block">
-        <img src="{{ url_for('static', filename=banner2.file_path) }}?v={{ banner2.updated_at.timestamp() | int if banner2.updated_at else '' }}"
-             alt="{{ banner2.alt_text }}"
-             class="w-full rounded-xl object-cover" style="aspect-ratio: 3/1;">
-    </a>
-    {% endif %}
+    {{ banner_img('banner_home_1', '3/1') }}
+    {{ banner_img('banner_home_2', '3/1') }}
 </div>
 {% endif %}
 
@@ -82,17 +82,10 @@
     </a>
 </div>
 
-<!-- ===== タスク下バナー（1枠） ===== -->
-{% set banner3 = get_asset('banner_home_3') %}
-{% if banner3 and banner3.file_path %}
+<!-- ===== タスク下バナー（1枠: 1200x300） ===== -->
 <div class="mb-4">
-    <a href="{{ banner3.link_url or '#' }}" class="block">
-        <img src="{{ url_for('static', filename=banner3.file_path) }}?v={{ banner3.updated_at.timestamp() | int if banner3.updated_at else '' }}"
-             alt="{{ banner3.alt_text }}"
-             class="w-full rounded-xl object-cover" style="aspect-ratio: 4/1;">
-    </a>
+    {{ banner_img('banner_home_3', '4/1') }}
 </div>
-{% endif %}
 
 <!-- お知らせ -->
 <div class="bg-off-white rounded-xl p-4 mb-4">
@@ -112,27 +105,109 @@
     </ul>
 </div>
 
-<!-- ===== お知らせ下バナー（1枠） ===== -->
-{% set banner4 = get_asset('banner_home_4') %}
-{% if banner4 and banner4.file_path %}
-<div class="mb-4">
-    <a href="{{ banner4.link_url or '#' }}" class="block">
-        <img src="{{ url_for('static', filename=banner4.file_path) }}?v={{ banner4.updated_at.timestamp() | int if banner4.updated_at else '' }}"
-             alt="{{ banner4.alt_text }}"
-             class="w-full rounded-xl object-cover" style="aspect-ratio: 4/1;">
+<!-- ===== お知らせ下バナー（2枠: 600x300 横並び） ===== -->
+{% set bn1 = get_asset('banner_news_1') %}
+{% set bn2 = get_asset('banner_news_2') %}
+{% if (bn1 and bn1.file_path) or (bn2 and bn2.file_path) %}
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+    {% if bn1 and bn1.file_path %}
+    <a href="{{ bn1.link_url or '#' }}" class="block">
+        <img src="{{ url_for('static', filename=bn1.file_path) }}?v={{ bn1.updated_at.timestamp() | int if bn1.updated_at else '' }}"
+             alt="{{ bn1.alt_text }}"
+             class="w-full rounded-xl object-cover" style="aspect-ratio: 2/1;">
     </a>
+    {% endif %}
+    {% if bn2 and bn2.file_path %}
+    <a href="{{ bn2.link_url or '#' }}" class="block">
+        <img src="{{ url_for('static', filename=bn2.file_path) }}?v={{ bn2.updated_at.timestamp() | int if bn2.updated_at else '' }}"
+             alt="{{ bn2.alt_text }}"
+             class="w-full rounded-xl object-cover" style="aspect-ratio: 2/1;">
+    </a>
+    {% endif %}
 </div>
 {% endif %}
 
-<!-- ===== フッター上バナー（1枠） ===== -->
-{% set banner_footer = get_asset('banner_footer') %}
-{% if banner_footer and banner_footer.file_path %}
-<div class="mb-2">
-    <a href="{{ banner_footer.link_url or '#' }}" class="block">
-        <img src="{{ url_for('static', filename=banner_footer.file_path) }}?v={{ banner_footer.updated_at.timestamp() | int if banner_footer.updated_at else '' }}"
-             alt="{{ banner_footer.alt_text }}"
-             class="w-full rounded-xl object-cover" style="aspect-ratio: 6/1;">
-    </a>
+<!-- ===== カスタム記事エリア ===== -->
+{% set art_wide = get_asset('article_wide') %}
+{% set art_h1 = get_asset('article_half_1') %}
+{% set art_h2 = get_asset('article_half_2') %}
+{% set art_h3 = get_asset('article_half_3') %}
+{% set art_h4 = get_asset('article_half_4') %}
+
+{% set has_articles = (art_wide and art_wide.content_html) or
+                      (art_h1 and art_h1.content_html) or (art_h2 and art_h2.content_html) or
+                      (art_h3 and art_h3.content_html) or (art_h4 and art_h4.content_html) %}
+
+{% if has_articles %}
+<div class="mb-4 space-y-3">
+    <!-- 1200幅 全幅記事 -->
+    {% if art_wide and art_wide.content_html %}
+    <div class="card article-content">
+        {{ art_wide.content_html | safe }}
+    </div>
+    {% endif %}
+
+    <!-- 600幅 x 2カラム 上段 -->
+    {% if (art_h1 and art_h1.content_html) or (art_h2 and art_h2.content_html) %}
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        {% if art_h1 and art_h1.content_html %}
+        <div class="card article-content">{{ art_h1.content_html | safe }}</div>
+        {% endif %}
+        {% if art_h2 and art_h2.content_html %}
+        <div class="card article-content">{{ art_h2.content_html | safe }}</div>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <!-- 600幅 x 2カラム 下段 -->
+    {% if (art_h3 and art_h3.content_html) or (art_h4 and art_h4.content_html) %}
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        {% if art_h3 and art_h3.content_html %}
+        <div class="card article-content">{{ art_h3.content_html | safe }}</div>
+        {% endif %}
+        {% if art_h4 and art_h4.content_html %}
+        <div class="card article-content">{{ art_h4.content_html | safe }}</div>
+        {% endif %}
+    </div>
+    {% endif %}
 </div>
 {% endif %}
+
+<!-- ===== フッター上バナー（8枠: 300x150 4列x2段） ===== -->
+{% set ft_keys = ['banner_ft_1','banner_ft_2','banner_ft_3','banner_ft_4','banner_ft_5','banner_ft_6','banner_ft_7','banner_ft_8'] %}
+{% set ft_banners = [] %}
+{% for key in ft_keys %}
+    {% set a = get_asset(key) %}
+    {% if a and a.file_path %}
+        {% if ft_banners.append(a) %}{% endif %}
+    {% endif %}
+{% endfor %}
+
+{% if ft_banners %}
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-2">
+    {% for key in ft_keys %}
+        {% set a = get_asset(key) %}
+        {% if a and a.file_path %}
+        <a href="{{ a.link_url or '#' }}" class="block">
+            <img src="{{ url_for('static', filename=a.file_path) }}?v={{ a.updated_at.timestamp() | int if a.updated_at else '' }}"
+                 alt="{{ a.alt_text }}"
+                 class="w-full rounded-lg object-cover" style="aspect-ratio: 2/1;">
+        </a>
+        {% endif %}
+    {% endfor %}
+</div>
+{% endif %}
+{% endblock %}
+
+{% block head %}
+<style>
+    .article-content p { margin-bottom: 0.5rem; }
+    .article-content strong { color: #E63946; }
+    .article-content a { color: #EF476F; text-decoration: underline; }
+    .article-content ul, .article-content ol { padding-left: 1.5rem; margin-bottom: 0.5rem; }
+    .article-content li { margin-bottom: 0.25rem; }
+    .article-content img { max-width: 100%; border-radius: 0.5rem; margin: 0.5rem 0; }
+    .article-content h2 { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem; color: #1F2937; }
+    .article-content h3 { font-size: 1rem; font-weight: 600; margin-bottom: 0.25rem; color: #1F2937; }
+</style>
 {% endblock %}

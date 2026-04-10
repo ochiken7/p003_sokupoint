@@ -168,8 +168,24 @@ def seed():
             SiteAsset(slot_key='banner_home_1', alt_text='上部バナー1'),
             SiteAsset(slot_key='banner_home_2', alt_text='上部バナー2'),
             SiteAsset(slot_key='banner_home_3', alt_text='タスク下バナー'),
-            SiteAsset(slot_key='banner_home_4', alt_text='お知らせ下バナー'),
-            SiteAsset(slot_key='banner_footer', alt_text='フッター上バナー'),
+            # お知らせ下バナー (600x300 x 2枠)
+            SiteAsset(slot_key='banner_news_1', alt_text='お知らせ下バナー左'),
+            SiteAsset(slot_key='banner_news_2', alt_text='お知らせ下バナー右'),
+            # フッター上バナー (300x150 x 8枠)
+            SiteAsset(slot_key='banner_ft_1', alt_text='フッターバナー1'),
+            SiteAsset(slot_key='banner_ft_2', alt_text='フッターバナー2'),
+            SiteAsset(slot_key='banner_ft_3', alt_text='フッターバナー3'),
+            SiteAsset(slot_key='banner_ft_4', alt_text='フッターバナー4'),
+            SiteAsset(slot_key='banner_ft_5', alt_text='フッターバナー5'),
+            SiteAsset(slot_key='banner_ft_6', alt_text='フッターバナー6'),
+            SiteAsset(slot_key='banner_ft_7', alt_text='フッターバナー7'),
+            SiteAsset(slot_key='banner_ft_8', alt_text='フッターバナー8'),
+            # カスタム記事エリア (5エリア)
+            SiteAsset(slot_key='article_wide', alt_text='記事エリア(全幅)'),
+            SiteAsset(slot_key='article_half_1', alt_text='記事エリア左上'),
+            SiteAsset(slot_key='article_half_2', alt_text='記事エリア右上'),
+            SiteAsset(slot_key='article_half_3', alt_text='記事エリア左下'),
+            SiteAsset(slot_key='article_half_4', alt_text='記事エリア右下'),
             SiteAsset(slot_key='favicon', alt_text='Favicon'),
         ]
         db.session.add_all(assets)
