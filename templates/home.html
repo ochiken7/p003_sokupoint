@@ -14,6 +14,39 @@
     {% endif %}
 {% endmacro %}
 
+{# --- PC/SP別バナー表示マクロ --- #}
+{% macro banner_img_responsive(pc_key, sp_key, pc_ratio, sp_ratio) %}
+    {% set pc_asset = get_asset(pc_key) %}
+    {% set sp_asset = get_asset(sp_key) %}
+    {% if pc_asset and pc_asset.file_path and sp_asset and sp_asset.file_path %}
+        {# 両方アップロード済: PC/SPで切替 #}
+        <a href="{{ pc_asset.link_url or '#' }}" class="hidden md:block">
+            <img src="{{ url_for('static', filename=pc_asset.file_path) }}?v={{ pc_asset.updated_at.timestamp() | int if pc_asset.updated_at else '' }}"
+                 alt="{{ pc_asset.alt_text }}"
+                 class="w-full rounded-xl object-cover" style="aspect-ratio: {{ pc_ratio }};">
+        </a>
+        <a href="{{ sp_asset.link_url or '#' }}" class="block md:hidden">
+            <img src="{{ url_for('static', filename=sp_asset.file_path) }}?v={{ sp_asset.updated_at.timestamp() | int if sp_asset.updated_at else '' }}"
+                 alt="{{ sp_asset.alt_text }}"
+                 class="w-full rounded-xl object-cover" style="aspect-ratio: {{ sp_ratio }};">
+        </a>
+    {% elif pc_asset and pc_asset.file_path %}
+        {# PC版のみ: 両方で表示 #}
+        <a href="{{ pc_asset.link_url or '#' }}" class="block">
+            <img src="{{ url_for('static', filename=pc_asset.file_path) }}?v={{ pc_asset.updated_at.timestamp() | int if pc_asset.updated_at else '' }}"
+                 alt="{{ pc_asset.alt_text }}"
+                 class="w-full rounded-xl object-cover" style="aspect-ratio: {{ pc_ratio }};">
+        </a>
+    {% elif sp_asset and sp_asset.file_path %}
+        {# SP版のみ: 両方で表示 #}
+        <a href="{{ sp_asset.link_url or '#' }}" class="block">
+            <img src="{{ url_for('static', filename=sp_asset.file_path) }}?v={{ sp_asset.updated_at.timestamp() | int if sp_asset.updated_at else '' }}"
+                 alt="{{ sp_asset.alt_text }}"
+                 class="w-full rounded-xl object-cover" style="aspect-ratio: {{ sp_ratio }};">
+        </a>
+    {% endif %}
+{% endmacro %}
+
 {% block content %}
 <!-- ユーザー情報カード -->
 <div class="card mb-4">
@@ -43,13 +76,15 @@
     </div>
 </div>
 
-<!-- ===== 上部バナー（2枠: 1200x400） ===== -->
-{% set b1 = get_asset('banner_home_1') %}
-{% set b2 = get_asset('banner_home_2') %}
-{% if (b1 and b1.file_path) or (b2 and b2.file_path) %}
+<!-- ===== 上部バナー（2枠: PC 1200x400 / SP 750x500） ===== -->
+{% set b1_pc = get_asset('banner_home_1') %}
+{% set b1_sp = get_asset('banner_home_1_sp') %}
+{% set b2_pc = get_asset('banner_home_2') %}
+{% set b2_sp = get_asset('banner_home_2_sp') %}
+{% if (b1_pc and b1_pc.file_path) or (b1_sp and b1_sp.file_path) or (b2_pc and b2_pc.file_path) or (b2_sp and b2_sp.file_path) %}
 <div class="mb-4 space-y-3">
-    {{ banner_img('banner_home_1', '3/1') }}
-    {{ banner_img('banner_home_2', '3/1') }}
+    {{ banner_img_responsive('banner_home_1', 'banner_home_1_sp', '3/1', '3/2') }}
+    {{ banner_img_responsive('banner_home_2', 'banner_home_2_sp', '3/1', '3/2') }}
 </div>
 {% endif %}
 
