@@ -31,21 +31,23 @@
     </div>
 </div>
 
-<!-- バナーエリア -->
+<!-- ===== 上部バナーエリア（2枠） ===== -->
 {% set banner1 = get_asset('banner_home_1') %}
 {% set banner2 = get_asset('banner_home_2') %}
 {% if (banner1 and banner1.file_path) or (banner2 and banner2.file_path) %}
 <div class="mb-4 space-y-3">
     {% if banner1 and banner1.file_path %}
     <a href="{{ banner1.link_url or '#' }}" class="block">
-        <img src="{{ url_for('static', filename=banner1.file_path) }}" alt="{{ banner1.alt_text }}"
-             class="w-full rounded-xl object-cover" style="max-height: 180px;">
+        <img src="{{ url_for('static', filename=banner1.file_path) }}?v={{ banner1.updated_at.timestamp() | int if banner1.updated_at else '' }}"
+             alt="{{ banner1.alt_text }}"
+             class="w-full rounded-xl object-cover" style="aspect-ratio: 3/1;">
     </a>
     {% endif %}
     {% if banner2 and banner2.file_path %}
     <a href="{{ banner2.link_url or '#' }}" class="block">
-        <img src="{{ url_for('static', filename=banner2.file_path) }}" alt="{{ banner2.alt_text }}"
-             class="w-full rounded-xl object-cover" style="max-height: 180px;">
+        <img src="{{ url_for('static', filename=banner2.file_path) }}?v={{ banner2.updated_at.timestamp() | int if banner2.updated_at else '' }}"
+             alt="{{ banner2.alt_text }}"
+             class="w-full rounded-xl object-cover" style="aspect-ratio: 3/1;">
     </a>
     {% endif %}
 </div>
@@ -57,26 +59,22 @@
     今日のタスク
 </h2>
 
-<div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-    <!-- ログインボーナス -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
     <a href="{{ url_for('login_bonus.index') }}" class="card text-center hover:border-primary transition-colors">
         <i data-lucide="gift" class="w-8 h-8 text-primary mx-auto mb-2"></i>
         <div class="text-xs font-medium text-gray-600">ログインボーナス</div>
         <div class="text-xs text-accent1 mt-1 font-bold">受取可能</div>
     </a>
-    <!-- ゲーム -->
     <a href="{{ url_for('game.index') }}" class="card text-center hover:border-primary transition-colors">
         <i data-lucide="gamepad-2" class="w-8 h-8 text-primary mx-auto mb-2"></i>
         <div class="text-xs font-medium text-gray-600">ミニゲーム</div>
         <div class="text-xs text-gray-400 mt-1">1日1回</div>
     </a>
-    <!-- クーポン -->
     <a href="{{ url_for('coupon.index') }}" class="card text-center hover:border-primary transition-colors">
         <i data-lucide="ticket" class="w-8 h-8 text-primary mx-auto mb-2"></i>
         <div class="text-xs font-medium text-gray-600">クーポン</div>
         <div class="text-xs text-gray-400 mt-1">応募受付中</div>
     </a>
-    <!-- チェックイン -->
     <a href="{{ url_for('checkin.index') }}" class="card text-center hover:border-primary transition-colors">
         <i data-lucide="map-pin" class="w-8 h-8 text-primary mx-auto mb-2"></i>
         <div class="text-xs font-medium text-gray-600">チェックイン</div>
@@ -84,8 +82,20 @@
     </a>
 </div>
 
-<!-- お知らせ風セクション -->
-<div class="bg-off-white rounded-xl p-4">
+<!-- ===== タスク下バナー（1枠） ===== -->
+{% set banner3 = get_asset('banner_home_3') %}
+{% if banner3 and banner3.file_path %}
+<div class="mb-4">
+    <a href="{{ banner3.link_url or '#' }}" class="block">
+        <img src="{{ url_for('static', filename=banner3.file_path) }}?v={{ banner3.updated_at.timestamp() | int if banner3.updated_at else '' }}"
+             alt="{{ banner3.alt_text }}"
+             class="w-full rounded-xl object-cover" style="aspect-ratio: 4/1;">
+    </a>
+</div>
+{% endif %}
+
+<!-- お知らせ -->
+<div class="bg-off-white rounded-xl p-4 mb-4">
     <h3 class="font-bold text-sm text-gray-700 mb-2 flex items-center gap-1">
         <i data-lucide="bell" class="w-4 h-4 text-primary"></i>
         お知らせ
@@ -101,4 +111,28 @@
         </li>
     </ul>
 </div>
+
+<!-- ===== お知らせ下バナー（1枠） ===== -->
+{% set banner4 = get_asset('banner_home_4') %}
+{% if banner4 and banner4.file_path %}
+<div class="mb-4">
+    <a href="{{ banner4.link_url or '#' }}" class="block">
+        <img src="{{ url_for('static', filename=banner4.file_path) }}?v={{ banner4.updated_at.timestamp() | int if banner4.updated_at else '' }}"
+             alt="{{ banner4.alt_text }}"
+             class="w-full rounded-xl object-cover" style="aspect-ratio: 4/1;">
+    </a>
+</div>
+{% endif %}
+
+<!-- ===== フッター上バナー（1枠） ===== -->
+{% set banner_footer = get_asset('banner_footer') %}
+{% if banner_footer and banner_footer.file_path %}
+<div class="mb-2">
+    <a href="{{ banner_footer.link_url or '#' }}" class="block">
+        <img src="{{ url_for('static', filename=banner_footer.file_path) }}?v={{ banner_footer.updated_at.timestamp() | int if banner_footer.updated_at else '' }}"
+             alt="{{ banner_footer.alt_text }}"
+             class="w-full rounded-xl object-cover" style="aspect-ratio: 6/1;">
+    </a>
+</div>
+{% endif %}
 {% endblock %}

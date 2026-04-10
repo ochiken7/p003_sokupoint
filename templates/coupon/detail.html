@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% block title %}{{ coupon.title }} - 即ポイントクラブ{% endblock %}
+
+{% block content %}
+<!-- 戻るリンク -->
+<div class="mb-3">
+    <a href="{{ url_for('coupon.index') }}" class="text-sm text-gray-500 hover:text-primary flex items-center gap-1">
+        <i data-lucide="arrow-left" class="w-4 h-4"></i>クーポン一覧
+    </a>
+</div>
+
+<!-- メイン画像 -->
+{% if coupon.image_path %}
+<img src="{{ url_for('static', filename=coupon.image_path) }}" alt="{{ coupon.title }}"
+     class="w-full rounded-xl object-cover mb-4" style="aspect-ratio: 3/1;">
+{% endif %}
+
+<!-- ヘッダー情報 -->
+<div class="card mb-4">
+    <h1 class="text-xl font-bold text-gray-800 mb-2">{{ coupon.title }}</h1>
+    <p class="text-sm text-gray-500 mb-3">{{ coupon.description }}</p>
+
+    <div class="flex flex-wrap items-center gap-3 text-xs text-gray-500">
+        <span class="flex items-center gap-1 bg-off-white px-2 py-1 rounded">
+            <i data-lucide="clock" class="w-3.5 h-3.5 text-primary"></i>
+            {{ coupon.entry_start.strftime('%m/%d') }} ~ {{ coupon.entry_end.strftime('%m/%d') }}
+        </span>
+        <span class="flex items-center gap-1 bg-off-white px-2 py-1 rounded">
+            <i data-lucide="users" class="w-3.5 h-3.5 text-primary"></i>
+            当選枠 {{ coupon.winner_count }}名様
+        </span>
+        <span class="flex items-center gap-1 bg-off-white px-2 py-1 rounded">
+            <i data-lucide="award" class="w-3.5 h-3.5 text-primary"></i>
+            {{ coupon.required_rank }}ランク以上
+        </span>
+    </div>
+</div>
+
+<!-- 記事本文 -->
+{% if coupon.body_html %}
+<div class="card mb-4">
+    <div class="prose prose-sm max-w-none text-gray-700 leading-relaxed coupon-body">
+        {{ coupon.body_html | safe }}
+    </div>
+</div>
+{% endif %}
+
+<!-- エントリーエリア -->
+<div class="card text-center">
+    {% if entered %}
+        <!-- 応募済み -->
+        <div class="py-4">
+            {% if entered.is_winner %}
+            <i data-lucide="party-popper" class="w-12 h-12 text-primary mx-auto mb-2"></i>
+            <p class="text-lg font-bold text-primary">当選しました!</p>
+            {% else %}
+            <i data-lucide="check-circle" class="w-12 h-12 text-success mx-auto mb-2"></i>
+            <p class="text-lg font-bold text-gray-800">応募済みです</p>
+            {% endif %}
+            <p class="text-sm text-gray-500 mt-1">{{ entered.entered_at.strftime('%m/%d %H:%M') }} に応募しました</p>
+        </div>
+    {% elif not in_period %}
+        <!-- 期間外 -->
+        <div class="py-4">
+            <i data-lucide="clock" class="w-12 h-12 text-gray-300 mx-auto mb-2"></i>
+            <p class="text-gray-500">応募期間外です</p>
+        </div>
+    {% elif not rank_ok %}
+        <!-- ランク不足 -->
+        <div class="py-4">
+            <i data-lucide="lock" class="w-12 h-12 text-gray-300 mx-auto mb-2"></i>
+            <p class="text-gray-500">{{ coupon.required_rank }}ランク以上が必要です</p>
+            <a href="{{ url_for('rank.index') }}" class="text-xs text-primary hover:underline mt-1 inline-block">ランクを確認する</a>
+        </div>
+    {% else %}
+        <!-- 応募可能 -->
+        <div class="py-4">
+            <p class="text-sm text-gray-500 mb-3">このクーポンに応募しますか?</p>
+            <form method="POST" action="{{ url_for('coupon.entry', coupon_id=coupon.id) }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn-primary text-lg px-8 py-3">
+                    応募する (+10P)
+                </button>
+            </form>
+            <p class="text-xs text-gray-400 mt-2">応募するだけで10ポイントもらえます</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block head %}
+<style>
+    .coupon-body p { margin-bottom: 0.75rem; }
+    .coupon-body strong { color: #E63946; }
+    .coupon-body ul { list-style: disc; padding-left: 1.5rem; margin-bottom: 0.75rem; }
+    .coupon-body li { margin-bottom: 0.25rem; }
+</style>
+{% endblock %}

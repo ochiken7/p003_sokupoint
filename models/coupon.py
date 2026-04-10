@@ -13,6 +13,7 @@ class Coupon(db.Model):
     entry_end = db.Column(db.DateTime)
     winner_count = db.Column(db.Integer, nullable=False, default=1)
     image_path = db.Column(db.Text)
+    body_html = db.Column(db.Text)  # クーポン詳細記事（HTML可）
     is_active = db.Column(db.Boolean, nullable=False, default=True)
 
     entries = db.relationship('CouponEntry', backref='coupon', lazy='dynamic', cascade='all, delete-orphan')

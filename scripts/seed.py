@@ -112,13 +112,16 @@ def seed():
         coupons = [
             Coupon(title='VIP限定 プレミアムクーポン', description='VIP会員だけの特別クーポン',
                    required_rank='VIP', entry_start=now, entry_end=now + timedelta(days=30),
-                   winner_count=1, is_active=True),
+                   winner_count=1, is_active=True,
+                   body_html='<p>VIP会員様限定の特別クーポンです。当選された方には、プレミアムコース60分が無料でご利用いただけます。</p><p>このチャンスをお見逃しなく!</p>'),
             Coupon(title='GOLD以上 特別割引', description='ゴールド会員以上が応募可能',
                    required_rank='GOLD', entry_start=now, entry_end=now + timedelta(days=14),
-                   winner_count=3, is_active=True),
+                   winner_count=3, is_active=True,
+                   body_html='<p>ゴールド会員以上の方が応募できる割引クーポンです。</p><p>当選者には次回ご利用時に使える <strong>3,000円割引クーポン</strong> をお届けします。3名様に当たります!</p>'),
             Coupon(title='全員参加OK! ドリンク無料券', description='ランク不問で応募できます',
                    required_rank='BRONZE', entry_start=now, entry_end=now + timedelta(days=7),
-                   winner_count=10, is_active=True),
+                   winner_count=10, is_active=True,
+                   body_html='<p>ランク不問! どなたでも応募できるキャンペーンです。</p><p>当選された10名様に <strong>ドリンク無料券</strong> をプレゼント。応募するだけで10Pも獲得できます。</p>'),
             Coupon(title='期間終了クーポン（参考用）', description='既に期間が終了したクーポン',
                    required_rank='BRONZE', entry_start=now - timedelta(days=30), entry_end=now - timedelta(days=1),
                    winner_count=5, is_active=False),
@@ -162,8 +165,11 @@ def seed():
         # === サイトアセット初期値 ===
         assets = [
             SiteAsset(slot_key='logo_header', alt_text='即ポイントクラブ'),
-            SiteAsset(slot_key='banner_home_1', alt_text='バナー1'),
-            SiteAsset(slot_key='banner_home_2', alt_text='バナー2'),
+            SiteAsset(slot_key='banner_home_1', alt_text='上部バナー1'),
+            SiteAsset(slot_key='banner_home_2', alt_text='上部バナー2'),
+            SiteAsset(slot_key='banner_home_3', alt_text='タスク下バナー'),
+            SiteAsset(slot_key='banner_home_4', alt_text='お知らせ下バナー'),
+            SiteAsset(slot_key='banner_footer', alt_text='フッター上バナー'),
             SiteAsset(slot_key='favicon', alt_text='Favicon'),
         ]
         db.session.add_all(assets)

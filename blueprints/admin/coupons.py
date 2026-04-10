@@ -52,6 +52,7 @@ def _save_coupon(coupon, form):
     coupon.description = form.get('description', '')
     coupon.required_rank = form.get('required_rank', 'BRONZE')
     coupon.winner_count = int(form.get('winner_count', 1))
+    coupon.body_html = form.get('body_html', '')
     coupon.is_active = 'is_active' in form
     start = form.get('entry_start')
     end = form.get('entry_end')

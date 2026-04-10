@@ -12,12 +12,13 @@
         <form method="POST" enctype="multipart/form-data">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <input type="hidden" name="slot_key" value="{{ slot_key }}">
+            <input type="hidden" name="action" value="save">
 
             <div class="flex items-start gap-4">
                 <!-- プレビュー -->
-                <div class="w-24 h-16 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
+                <div class="w-32 h-20 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
                     {% if data.asset and data.asset.file_path %}
-                    <img src="{{ url_for('static', filename=data.asset.file_path) }}" alt="" class="max-w-full max-h-full object-contain">
+                    <img src="{{ url_for('static', filename=data.asset.file_path) }}?v={{ data.asset.updated_at.timestamp() | int if data.asset.updated_at else '' }}" alt="" class="max-w-full max-h-full object-contain">
                     {% else %}
                     <i data-lucide="image" class="w-8 h-8 text-gray-300"></i>
                     {% endif %}
@@ -48,13 +49,38 @@
                         </div>
                     </div>
 
-                    <button type="submit" class="bg-gray-800 text-white px-4 py-1.5 rounded-lg text-xs font-bold hover:bg-gray-700">
-                        保存
-                    </button>
+                    <div class="flex items-center gap-2">
+                        <button type="submit" class="bg-gray-800 text-white px-4 py-1.5 rounded-lg text-xs font-bold hover:bg-gray-700">
+                            保存
+                        </button>
+                        {% if data.asset and data.asset.file_path %}
+                        <button type="button" onclick="deleteAsset('{{ slot_key }}')"
+                                class="text-red-400 hover:text-red-600 text-xs font-bold px-3 py-1.5 border border-red-200 rounded-lg hover:bg-red-50 transition-colors">
+                            画像を削除
+                        </button>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
+        </form>
+
+        <!-- 削除用の別フォーム -->
+        <form method="POST" id="delete-form-{{ slot_key }}" class="hidden">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="slot_key" value="{{ slot_key }}">
+            <input type="hidden" name="action" value="delete">
         </form>
     </div>
     {% endfor %}
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function deleteAsset(slotKey) {
+    if (confirm('この画像を削除しますか?')) {
+        document.getElementById('delete-form-' + slotKey).submit();
+    }
+}
+</script>
 {% endblock %}
