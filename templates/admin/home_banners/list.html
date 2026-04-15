@@ -5,7 +5,7 @@
 <div class="flex items-center justify-between mb-4">
     <div>
         <h1 class="text-xl font-bold text-gray-800">トップバナー管理</h1>
-        <p class="text-xs text-gray-500 mt-1">複数登録するとスライドショー表示されます。サイズは600x266px推奨。</p>
+        <p class="text-xs text-gray-500 mt-1">複数登録するとスライドショー表示されます。PC 1200x400px / SP 750x500px 推奨。</p>
     </div>
 </div>
 
@@ -43,14 +43,14 @@
             <div>
                 <label class="block text-xs text-gray-500 mb-0.5">
                     PC版画像 <span class="text-red-500">*必須</span>
-                    <span class="text-gray-400">(推奨 600x266px / 約9:4)</span>
+                    <span class="text-gray-400">(推奨 1200x400px / 3:1)</span>
                 </label>
                 <input type="file" name="file_pc" accept="image/*" required
                        class="text-xs text-gray-600 file:mr-2 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-medium file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200">
             </div>
             <div>
                 <label class="block text-xs text-gray-500 mb-0.5">
-                    SP版画像 <span class="text-gray-400">(任意・推奨 600x266px / 約9:4)</span>
+                    SP版画像 <span class="text-gray-400">(任意・推奨 750x500px / 3:2)</span>
                 </label>
                 <input type="file" name="file_sp" accept="image/*"
                        class="text-xs text-gray-600 file:mr-2 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-medium file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200">
@@ -92,9 +92,9 @@
     {% for b in banners %}
     <div class="bg-white rounded-xl border border-gray-200 p-4">
         <div class="flex items-start gap-4">
-            <!-- プレビュー (600x266 縦横比) -->
+            <!-- プレビュー -->
             <div class="flex flex-col gap-1 flex-shrink-0">
-                <div class="bg-gray-100 rounded flex items-center justify-center overflow-hidden" style="width: 144px; aspect-ratio: 600/266;">
+                <div class="bg-gray-100 rounded flex items-center justify-center overflow-hidden" style="width: 144px; aspect-ratio: 3/1;">
                     {% if b.file_path_pc %}
                     <img src="{{ url_for('static', filename=b.file_path_pc) }}?v={{ b.updated_at.timestamp() | int }}"
                          alt="" class="w-full h-full object-cover">
@@ -102,7 +102,7 @@
                 </div>
                 <div class="text-[10px] text-gray-400 text-center">PC</div>
                 {% if b.file_path_sp %}
-                <div class="bg-gray-100 rounded flex items-center justify-center overflow-hidden mt-1" style="width: 144px; aspect-ratio: 600/266;">
+                <div class="bg-gray-100 rounded flex items-center justify-center overflow-hidden mt-1" style="width: 96px; aspect-ratio: 3/2;">
                     <img src="{{ url_for('static', filename=b.file_path_sp) }}?v={{ b.updated_at.timestamp() | int }}"
                          alt="" class="w-full h-full object-cover">
                 </div>

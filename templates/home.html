@@ -78,9 +78,9 @@
 
 <!-- ===== トップメインバナー (スライドショー) ===== -->
 {% if banners %}
-<div class="home-slider mb-4 relative overflow-hidden rounded-xl mx-auto" data-slide-count="{{ banners | length }}" style="max-width: 600px;">
-    <!-- アスペクト比 600x266 (約9:4) PC/SP共通 -->
-    <div class="relative w-full" style="aspect-ratio: 600/266;">
+<div class="home-slider mb-4 relative overflow-hidden rounded-xl" data-slide-count="{{ banners | length }}">
+    <!-- PC: 3/1 (1200x400), SP: 3/2 (750x500) -->
+    <div class="relative w-full md:aspect-[3/1] aspect-[3/2]">
         {% for b in banners %}
         <a href="{{ b.link_url or '#' }}"
            class="slide absolute inset-0 transition-opacity duration-700 ease-in-out"
