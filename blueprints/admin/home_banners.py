@@ -4,6 +4,9 @@ from flask import render_template, request, redirect, url_for, flash, current_ap
 from extensions import db
 from blueprints.admin import admin_bp, admin_required
 from models.home_banner import HomeBanner
+from services.setting_service import get_setting_int, set_setting
+
+DEFAULT_SLIDE_INTERVAL = 5  # 秒
 
 ALLOWED_EXT = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
 SUBDIR = 'banners/home_slider'
@@ -54,7 +57,26 @@ def _delete_banner_files(banner):
 @admin_required
 def home_banners_list():
     banners = HomeBanner.query.order_by(HomeBanner.position, HomeBanner.id).all()
-    return render_template('admin/home_banners/list.html', banners=banners)
+    slide_interval = get_setting_int('home_slide_interval', DEFAULT_SLIDE_INTERVAL)
+    return render_template('admin/home_banners/list.html',
+                           banners=banners, slide_interval=slide_interval)
+
+
+@admin_bp.route('/home-banners/settings', methods=['POST'])
+@admin_required
+def home_banners_settings():
+    """スライド間隔等の設定を保存"""
+    try:
+        interval = int(request.form.get('slide_interval', DEFAULT_SLIDE_INTERVAL))
+        if interval < 1:
+            interval = 1
+        if interval > 60:
+            interval = 60
+    except ValueError:
+        interval = DEFAULT_SLIDE_INTERVAL
+    set_setting('home_slide_interval', interval)
+    flash(f'スライド間隔を {interval} 秒に設定しました。', 'success')
+    return redirect(url_for('admin.home_banners_list'))
 
 
 @admin_bp.route('/home-banners/new', methods=['POST'])

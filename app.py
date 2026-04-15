@@ -17,7 +17,7 @@ def create_app():
     csrf.init_app(app)
 
     # モデル読み込み（マイグレーション用）
-    from models import user, point, login_bonus, game, coupon, checkin, trophy, site_asset, home_banner  # noqa: F401
+    from models import user, point, login_bonus, game, coupon, checkin, trophy, site_asset, home_banner, site_setting  # noqa: F401
 
     # Blueprint 登録
     from blueprints.auth import auth_bp

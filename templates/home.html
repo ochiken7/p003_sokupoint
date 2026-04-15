@@ -78,10 +78,9 @@
 
 <!-- ===== トップメインバナー (スライドショー) ===== -->
 {% if banners %}
-<div class="home-slider mb-4 relative overflow-hidden rounded-xl" data-slide-count="{{ banners | length }}">
-    <!-- PC: 3/1, SP: 3/2 -->
-    <div class="relative w-full" style="aspect-ratio: 3/2;">
-        <style>@media (min-width: 768px) { .home-slider > div { aspect-ratio: 3/1 !important; } }</style>
+<div class="home-slider mb-4 relative overflow-hidden rounded-xl mx-auto" data-slide-count="{{ banners | length }}" style="max-width: 600px;">
+    <!-- アスペクト比 600x266 (約9:4) PC/SP共通 -->
+    <div class="relative w-full" style="aspect-ratio: 600/266;">
         {% for b in banners %}
         <a href="{{ b.link_url or '#' }}"
            class="slide absolute inset-0 transition-opacity duration-700 ease-in-out"
@@ -274,6 +273,7 @@
     const dots = slider.querySelectorAll('.dot');
     if (slides.length <= 1) return;
 
+    const intervalMs = {{ slide_interval_ms }};
     let current = 0;
     setInterval(function() {
         slides[current].style.opacity = '0';
@@ -287,7 +287,7 @@
             dots[current].classList.remove('bg-white/60');
             dots[current].classList.add('bg-white');
         }
-    }, 5000);
+    }, intervalMs);
 })();
 </script>
 {% endblock %}

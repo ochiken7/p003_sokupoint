@@ -7,10 +7,11 @@ from models.checkin import Store, Checkin
 from models.trophy import Trophy, UserTrophy
 from models.site_asset import SiteAsset
 from models.home_banner import HomeBanner
+from models.site_setting import SiteSetting
 
 __all__ = [
     'User', 'Rank', 'PointHistory', 'LoginBonusLog',
     'Game', 'GameOutcome', 'QuizQuestion', 'GamePlayLog',
     'Coupon', 'CouponEntry', 'Store', 'Checkin',
-    'Trophy', 'UserTrophy', 'SiteAsset', 'HomeBanner',
+    'Trophy', 'UserTrophy', 'SiteAsset', 'HomeBanner', 'SiteSetting',
 ]

@@ -5,8 +5,30 @@
 <div class="flex items-center justify-between mb-4">
     <div>
         <h1 class="text-xl font-bold text-gray-800">トップバナー管理</h1>
-        <p class="text-xs text-gray-500 mt-1">複数登録すると5秒ごとにスライドショー表示されます。</p>
+        <p class="text-xs text-gray-500 mt-1">複数登録するとスライドショー表示されます。サイズは600x266px推奨。</p>
     </div>
+</div>
+
+<!-- スライド設定 -->
+<div class="bg-white rounded-xl border border-gray-200 p-4 mb-4">
+    <h2 class="font-bold text-gray-800 text-sm mb-3 flex items-center gap-1">
+        <i data-lucide="settings" class="w-4 h-4 text-primary"></i>スライド設定
+    </h2>
+    <form method="POST" action="{{ url_for('admin.home_banners_settings') }}" class="flex items-end gap-3 flex-wrap">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div>
+            <label class="block text-xs text-gray-500 mb-0.5">スライド切替間隔</label>
+            <div class="flex items-center gap-1">
+                <input type="number" name="slide_interval" value="{{ slide_interval }}" min="1" max="60"
+                       class="w-20 px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-primary/30">
+                <span class="text-sm text-gray-600">秒</span>
+            </div>
+            <p class="text-xs text-gray-400 mt-0.5">1〜60秒で指定 (バナー2枚以上の時のみ動作)</p>
+        </div>
+        <button type="submit" class="bg-gray-800 text-white px-4 py-1.5 rounded-lg text-sm font-bold hover:bg-gray-700">
+            設定を保存
+        </button>
+    </form>
 </div>
 
 <!-- 新規追加フォーム -->
@@ -21,14 +43,14 @@
             <div>
                 <label class="block text-xs text-gray-500 mb-0.5">
                     PC版画像 <span class="text-red-500">*必須</span>
-                    <span class="text-gray-400">(推奨 1200x400px / 3:1)</span>
+                    <span class="text-gray-400">(推奨 600x266px / 約9:4)</span>
                 </label>
                 <input type="file" name="file_pc" accept="image/*" required
                        class="text-xs text-gray-600 file:mr-2 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-medium file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200">
             </div>
             <div>
                 <label class="block text-xs text-gray-500 mb-0.5">
-                    SP版画像 <span class="text-gray-400">(任意・推奨 750x500px / 3:2)</span>
+                    SP版画像 <span class="text-gray-400">(任意・推奨 600x266px / 約9:4)</span>
                 </label>
                 <input type="file" name="file_sp" accept="image/*"
                        class="text-xs text-gray-600 file:mr-2 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-medium file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200">
@@ -70,19 +92,19 @@
     {% for b in banners %}
     <div class="bg-white rounded-xl border border-gray-200 p-4">
         <div class="flex items-start gap-4">
-            <!-- プレビュー -->
+            <!-- プレビュー (600x266 縦横比) -->
             <div class="flex flex-col gap-1 flex-shrink-0">
-                <div class="w-32 h-11 bg-gray-100 rounded flex items-center justify-center overflow-hidden">
+                <div class="bg-gray-100 rounded flex items-center justify-center overflow-hidden" style="width: 144px; aspect-ratio: 600/266;">
                     {% if b.file_path_pc %}
                     <img src="{{ url_for('static', filename=b.file_path_pc) }}?v={{ b.updated_at.timestamp() | int }}"
-                         alt="" class="max-w-full max-h-full object-contain">
+                         alt="" class="w-full h-full object-cover">
                     {% endif %}
                 </div>
                 <div class="text-[10px] text-gray-400 text-center">PC</div>
                 {% if b.file_path_sp %}
-                <div class="w-32 h-16 bg-gray-100 rounded flex items-center justify-center overflow-hidden mt-1">
+                <div class="bg-gray-100 rounded flex items-center justify-center overflow-hidden mt-1" style="width: 144px; aspect-ratio: 600/266;">
                     <img src="{{ url_for('static', filename=b.file_path_sp) }}?v={{ b.updated_at.timestamp() | int }}"
-                         alt="" class="max-w-full max-h-full object-contain">
+                         alt="" class="w-full h-full object-cover">
                 </div>
                 <div class="text-[10px] text-gray-400 text-center">SP</div>
                 {% endif %}
