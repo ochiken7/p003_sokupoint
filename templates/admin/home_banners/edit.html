@@ -1,0 +1,81 @@
+{% extends 'admin/base.html' %}
+{% block title %}トップバナー編集{% endblock %}
+
+{% block content %}
+<div class="flex items-center gap-3 mb-4">
+    <a href="{{ url_for('admin.home_banners_list') }}" class="text-gray-400 hover:text-primary">
+        <i data-lucide="arrow-left" class="w-5 h-5"></i>
+    </a>
+    <h1 class="text-xl font-bold text-gray-800">トップバナー編集</h1>
+</div>
+
+<form method="POST" enctype="multipart/form-data" class="space-y-4 max-w-2xl">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+    <!-- PC画像 -->
+    <div class="bg-white rounded-xl border border-gray-200 p-4">
+        <h2 class="font-bold text-gray-800 text-sm mb-3 flex items-center gap-1">
+            <i data-lucide="monitor" class="w-4 h-4 text-primary"></i>PC版画像 (必須・推奨1200x400px)
+        </h2>
+        {% if banner.file_path_pc %}
+        <div class="mb-3">
+            <img src="{{ url_for('static', filename=banner.file_path_pc) }}?v={{ banner.updated_at.timestamp() | int }}"
+                 alt="PC版" class="max-w-md w-full rounded-lg border border-gray-200">
+        </div>
+        {% endif %}
+        <input type="file" name="file_pc" accept="image/*"
+               class="text-xs text-gray-600 file:mr-2 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-medium file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200">
+        <p class="text-xs text-gray-400 mt-1">変更する場合のみファイルを選択してください</p>
+    </div>
+
+    <!-- SP画像 -->
+    <div class="bg-white rounded-xl border border-gray-200 p-4">
+        <h2 class="font-bold text-gray-800 text-sm mb-3 flex items-center gap-1">
+            <i data-lucide="smartphone" class="w-4 h-4 text-primary"></i>SP版画像 (任意・推奨750x500px)
+        </h2>
+        {% if banner.file_path_sp %}
+        <div class="mb-3">
+            <img src="{{ url_for('static', filename=banner.file_path_sp) }}?v={{ banner.updated_at.timestamp() | int }}"
+                 alt="SP版" class="max-w-xs w-full rounded-lg border border-gray-200">
+        </div>
+        {% endif %}
+        <input type="file" name="file_sp" accept="image/*"
+               class="text-xs text-gray-600 file:mr-2 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-medium file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200">
+        <p class="text-xs text-gray-400 mt-1">SP版を設定しない場合はPC版が両デバイスで使われます</p>
+    </div>
+
+    <!-- メタ情報 -->
+    <div class="bg-white rounded-xl border border-gray-200 p-4 space-y-3">
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Alt文言</label>
+            <input type="text" name="alt_text" value="{{ banner.alt_text or '' }}"
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30">
+        </div>
+
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">リンク先URL</label>
+            <input type="text" name="link_url" value="{{ banner.link_url or '' }}" placeholder="https://..."
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30">
+        </div>
+
+        <label class="flex items-center gap-2 text-sm text-gray-700">
+            <input type="checkbox" name="is_active" {{ 'checked' if banner.is_active }} class="w-4 h-4 text-primary rounded">
+            有効にする
+        </label>
+    </div>
+
+    <div class="flex gap-3">
+        <button type="submit" class="bg-primary text-white px-6 py-2 rounded-lg text-sm font-bold hover:opacity-90">保存</button>
+        <a href="{{ url_for('admin.home_banners_list') }}" class="px-6 py-2 rounded-lg text-sm text-gray-600 border border-gray-300 hover:bg-gray-50">キャンセル</a>
+    </div>
+</form>
+
+{% if banner.file_path_sp %}
+<form method="POST" action="{{ url_for('admin.home_banners_delete_sp', banner_id=banner.id) }}" class="mt-3 max-w-2xl" onsubmit="return confirm('SP版画像を削除しますか?')">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button type="submit" class="text-xs text-red-500 border border-red-200 px-3 py-1 rounded hover:bg-red-50">
+        SP版画像だけを削除
+    </button>
+</form>
+{% endif %}
+{% endblock %}

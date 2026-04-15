@@ -1,0 +1,148 @@
+{% extends 'admin/base.html' %}
+{% block title %}トップバナー管理{% endblock %}
+
+{% block content %}
+<div class="flex items-center justify-between mb-4">
+    <div>
+        <h1 class="text-xl font-bold text-gray-800">トップバナー管理</h1>
+        <p class="text-xs text-gray-500 mt-1">複数登録すると5秒ごとにスライドショー表示されます。</p>
+    </div>
+</div>
+
+<!-- 新規追加フォーム -->
+<div class="bg-white rounded-xl border border-gray-200 p-4 mb-6">
+    <h2 class="font-bold text-gray-800 text-sm mb-3 flex items-center gap-1">
+        <i data-lucide="plus-circle" class="w-4 h-4 text-primary"></i>新規追加
+    </h2>
+    <form method="POST" action="{{ url_for('admin.home_banners_create') }}" enctype="multipart/form-data" class="space-y-3">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div>
+                <label class="block text-xs text-gray-500 mb-0.5">
+                    PC版画像 <span class="text-red-500">*必須</span>
+                    <span class="text-gray-400">(推奨 1200x400px / 3:1)</span>
+                </label>
+                <input type="file" name="file_pc" accept="image/*" required
+                       class="text-xs text-gray-600 file:mr-2 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-medium file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200">
+            </div>
+            <div>
+                <label class="block text-xs text-gray-500 mb-0.5">
+                    SP版画像 <span class="text-gray-400">(任意・推奨 750x500px / 3:2)</span>
+                </label>
+                <input type="file" name="file_sp" accept="image/*"
+                       class="text-xs text-gray-600 file:mr-2 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-medium file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200">
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div>
+                <label class="block text-xs text-gray-500 mb-0.5">Alt文言</label>
+                <input type="text" name="alt_text" placeholder="例: 新規会員キャンペーン"
+                       class="w-full px-2 py-1 border border-gray-300 rounded text-xs focus:outline-none focus:ring-1 focus:ring-primary/30">
+            </div>
+            <div>
+                <label class="block text-xs text-gray-500 mb-0.5">リンク先URL</label>
+                <input type="text" name="link_url" placeholder="https://..."
+                       class="w-full px-2 py-1 border border-gray-300 rounded text-xs focus:outline-none focus:ring-1 focus:ring-primary/30">
+            </div>
+        </div>
+
+        <div class="flex items-center justify-between">
+            <label class="flex items-center gap-2 text-sm text-gray-700">
+                <input type="checkbox" name="is_active" checked class="w-4 h-4 text-primary rounded">
+                有効にする
+            </label>
+            <button type="submit" class="bg-primary text-white px-4 py-2 rounded-lg text-sm font-bold hover:opacity-90 flex items-center gap-1">
+                <i data-lucide="upload" class="w-4 h-4"></i>追加
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- 一覧 -->
+<h2 class="font-bold text-gray-800 text-sm mb-3 flex items-center gap-1">
+    <i data-lucide="list" class="w-4 h-4 text-primary"></i>登録済みバナー ({{ banners | length }}件)
+</h2>
+
+{% if banners %}
+<div class="space-y-3">
+    {% for b in banners %}
+    <div class="bg-white rounded-xl border border-gray-200 p-4">
+        <div class="flex items-start gap-4">
+            <!-- プレビュー -->
+            <div class="flex flex-col gap-1 flex-shrink-0">
+                <div class="w-32 h-11 bg-gray-100 rounded flex items-center justify-center overflow-hidden">
+                    {% if b.file_path_pc %}
+                    <img src="{{ url_for('static', filename=b.file_path_pc) }}?v={{ b.updated_at.timestamp() | int }}"
+                         alt="" class="max-w-full max-h-full object-contain">
+                    {% endif %}
+                </div>
+                <div class="text-[10px] text-gray-400 text-center">PC</div>
+                {% if b.file_path_sp %}
+                <div class="w-32 h-16 bg-gray-100 rounded flex items-center justify-center overflow-hidden mt-1">
+                    <img src="{{ url_for('static', filename=b.file_path_sp) }}?v={{ b.updated_at.timestamp() | int }}"
+                         alt="" class="max-w-full max-h-full object-contain">
+                </div>
+                <div class="text-[10px] text-gray-400 text-center">SP</div>
+                {% endif %}
+            </div>
+
+            <!-- 情報 -->
+            <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 flex-wrap mb-1">
+                    <span class="text-xs font-bold text-gray-700">順位 {{ loop.index }}</span>
+                    <form method="POST" action="{{ url_for('admin.home_banners_toggle', banner_id=b.id) }}" class="inline">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" class="px-2 py-0.5 rounded text-xs font-bold
+                            {% if b.is_active %}bg-green-100 text-green-700{% else %}bg-gray-100 text-gray-500{% endif %}">
+                            {{ '有効' if b.is_active else '無効' }}
+                        </button>
+                    </form>
+                </div>
+
+                <div class="text-sm text-gray-800 mb-0.5 truncate">
+                    {{ b.alt_text or '(altなし)' }}
+                </div>
+                <div class="text-xs text-gray-400 truncate">
+                    {% if b.link_url %}
+                    <i data-lucide="link" class="w-3 h-3 inline"></i> {{ b.link_url }}
+                    {% else %}
+                    (リンクなし)
+                    {% endif %}
+                </div>
+
+                <!-- 操作 -->
+                <div class="flex items-center gap-1 mt-3">
+                    <form method="POST" action="{{ url_for('admin.home_banners_move', banner_id=b.id) }}" class="inline">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <input type="hidden" name="direction" value="up">
+                        <button type="submit" {{ 'disabled' if loop.first }} class="p-1.5 text-gray-500 hover:text-primary disabled:opacity-30 disabled:cursor-not-allowed border border-gray-300 rounded">
+                            <i data-lucide="arrow-up" class="w-3.5 h-3.5"></i>
+                        </button>
+                    </form>
+                    <form method="POST" action="{{ url_for('admin.home_banners_move', banner_id=b.id) }}" class="inline">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <input type="hidden" name="direction" value="down">
+                        <button type="submit" {{ 'disabled' if loop.last }} class="p-1.5 text-gray-500 hover:text-primary disabled:opacity-30 disabled:cursor-not-allowed border border-gray-300 rounded">
+                            <i data-lucide="arrow-down" class="w-3.5 h-3.5"></i>
+                        </button>
+                    </form>
+                    <a href="{{ url_for('admin.home_banners_edit', banner_id=b.id) }}" class="px-3 py-1 text-xs text-gray-600 border border-gray-300 rounded hover:bg-gray-50">編集</a>
+                    <form method="POST" action="{{ url_for('admin.home_banners_delete', banner_id=b.id) }}" class="inline" onsubmit="return confirm('このバナーを削除しますか?')">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button class="px-3 py-1 text-xs text-red-500 border border-red-200 rounded hover:bg-red-50">削除</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="bg-white rounded-xl border border-gray-200 p-8 text-center text-gray-500">
+    <i data-lucide="image" class="w-12 h-12 text-gray-300 mx-auto mb-2"></i>
+    <p class="text-sm">まだバナーが登録されていません</p>
+</div>
+{% endif %}
+{% endblock %}

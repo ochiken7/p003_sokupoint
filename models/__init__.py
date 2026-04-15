@@ -6,10 +6,11 @@ from models.coupon import Coupon, CouponEntry
 from models.checkin import Store, Checkin
 from models.trophy import Trophy, UserTrophy
 from models.site_asset import SiteAsset
+from models.home_banner import HomeBanner
 
 __all__ = [
     'User', 'Rank', 'PointHistory', 'LoginBonusLog',
     'Game', 'GameOutcome', 'QuizQuestion', 'GamePlayLog',
     'Coupon', 'CouponEntry', 'Store', 'Checkin',
-    'Trophy', 'UserTrophy', 'SiteAsset',
+    'Trophy', 'UserTrophy', 'SiteAsset', 'HomeBanner',
 ]

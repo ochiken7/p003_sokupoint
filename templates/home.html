@@ -76,15 +76,33 @@
     </div>
 </div>
 
-<!-- ===== 上部バナー（2枠: PC 1200x400 / SP 750x500） ===== -->
-{% set b1_pc = get_asset('banner_home_1') %}
-{% set b1_sp = get_asset('banner_home_1_sp') %}
-{% set b2_pc = get_asset('banner_home_2') %}
-{% set b2_sp = get_asset('banner_home_2_sp') %}
-{% if (b1_pc and b1_pc.file_path) or (b1_sp and b1_sp.file_path) or (b2_pc and b2_pc.file_path) or (b2_sp and b2_sp.file_path) %}
-<div class="mb-4 space-y-3">
-    {{ banner_img_responsive('banner_home_1', 'banner_home_1_sp', '3/1', '3/2') }}
-    {{ banner_img_responsive('banner_home_2', 'banner_home_2_sp', '3/1', '3/2') }}
+<!-- ===== トップメインバナー (スライドショー) ===== -->
+{% if banners %}
+<div class="home-slider mb-4 relative overflow-hidden rounded-xl" data-slide-count="{{ banners | length }}">
+    <!-- PC: 3/1, SP: 3/2 -->
+    <div class="relative w-full" style="aspect-ratio: 3/2;">
+        <style>@media (min-width: 768px) { .home-slider > div { aspect-ratio: 3/1 !important; } }</style>
+        {% for b in banners %}
+        <a href="{{ b.link_url or '#' }}"
+           class="slide absolute inset-0 transition-opacity duration-700 ease-in-out"
+           style="opacity: {{ '1' if loop.first else '0' }};">
+            <img class="hidden md:block w-full h-full object-cover"
+                 src="{{ url_for('static', filename=b.file_path_pc) }}?v={{ b.updated_at.timestamp() | int }}"
+                 alt="{{ b.alt_text or '' }}">
+            <img class="block md:hidden w-full h-full object-cover"
+                 src="{{ url_for('static', filename=(b.file_path_sp or b.file_path_pc)) }}?v={{ b.updated_at.timestamp() | int }}"
+                 alt="{{ b.alt_text or '' }}">
+        </a>
+        {% endfor %}
+    </div>
+
+    {% if banners | length > 1 %}
+    <div class="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5 z-10">
+        {% for _ in banners %}
+        <span class="w-2 h-2 rounded-full bg-white/60 dot{{ ' bg-white' if loop.first else '' }}"></span>
+        {% endfor %}
+    </div>
+    {% endif %}
 </div>
 {% endif %}
 
@@ -245,4 +263,31 @@
     .article-content h2 { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem; color: #1F2937; }
     .article-content h3 { font-size: 1rem; font-weight: 600; margin-bottom: 0.25rem; color: #1F2937; }
 </style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function() {
+    const slider = document.querySelector('.home-slider');
+    if (!slider) return;
+    const slides = slider.querySelectorAll('.slide');
+    const dots = slider.querySelectorAll('.dot');
+    if (slides.length <= 1) return;
+
+    let current = 0;
+    setInterval(function() {
+        slides[current].style.opacity = '0';
+        if (dots[current]) {
+            dots[current].classList.remove('bg-white');
+            dots[current].classList.add('bg-white/60');
+        }
+        current = (current + 1) % slides.length;
+        slides[current].style.opacity = '1';
+        if (dots[current]) {
+            dots[current].classList.remove('bg-white/60');
+            dots[current].classList.add('bg-white');
+        }
+    }, 5000);
+})();
+</script>
 {% endblock %}

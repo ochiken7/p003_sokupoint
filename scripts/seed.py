@@ -159,10 +159,7 @@ def seed():
         # === サイトアセット初期値 ===
         assets = [
             SiteAsset(slot_key='logo_header', alt_text='即ポイントクラブ'),
-            SiteAsset(slot_key='banner_home_1', alt_text='上部バナー1 (PC)'),
-            SiteAsset(slot_key='banner_home_1_sp', alt_text='上部バナー1 (SP)'),
-            SiteAsset(slot_key='banner_home_2', alt_text='上部バナー2 (PC)'),
-            SiteAsset(slot_key='banner_home_2_sp', alt_text='上部バナー2 (SP)'),
+            # ホーム上部メインバナーは home_banners テーブルで管理（複数登録可、スライドショー）
             SiteAsset(slot_key='banner_home_3', alt_text='タスク下バナー'),
             # お知らせ下バナー (600x300 x 2枠)
             SiteAsset(slot_key='banner_news_1', alt_text='お知らせ下バナー左'),

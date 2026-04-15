@@ -25,4 +25,4 @@ def logout():
 
 
 # サブモジュールのインポート（Blueprint登録後に読み込む）
-from blueprints.admin import dashboard, games, coupons, stores, users, trophies, assets  # noqa: F401, E402
+from blueprints.admin import dashboard, games, coupons, stores, users, trophies, assets, home_banners  # noqa: F401, E402
