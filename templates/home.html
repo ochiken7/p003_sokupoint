@@ -79,8 +79,8 @@
 <!-- ===== トップメインバナー (スライドショー) ===== -->
 {% if banners %}
 <div class="home-slider mb-4 relative overflow-hidden rounded-xl" data-slide-count="{{ banners | length }}">
-    <!-- PC: 2/1 (1200x600), SP: 4/3 (750x560) -->
-    <div class="relative w-full md:aspect-[2/1] aspect-[4/3]">
+    <!-- PC: 3/1 (1200x400), SP: 3/2 (750x500) -->
+    <div class="relative w-full md:aspect-[3/1] aspect-[3/2]">
         {% for b in banners %}
         <a href="{{ b.link_url or '#' }}"
            class="slide absolute inset-0 transition-opacity duration-700 ease-in-out"
